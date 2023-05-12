@@ -1,0 +1,19 @@
+.verContainer {
+    width: 100%;
+}
+
+.verCharacter {
+    background: #212121;
+    color: white;
+    border-radius: 5px;
+    width: 1em;
+}
+
+.verCharacter--inactive {
+    color: white;
+}
+
+.verCharacter--selected {
+    color: white;
+
+}

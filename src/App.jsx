@@ -5,20 +5,19 @@ import {
     ThemeProvider,
     Paper,
     createTheme,
-    IconButton,
     Typography,
     Button,
     Box,
     AppBar,
     Toolbar, Tabs,
-    Drawer, styled, InputBase, alpha
+    styled, InputBase, alpha
 } from "@mui/material";
 import {Home, Search, LocalMall, Chat} from "@mui/icons-material";
 import TabsLink from "./components/TabsLink";
-import {Outlet} from "react-router-dom";
+import {Link, Outlet} from "react-router-dom";
 
 
-const SearchBar = styled('div')(({ theme }) => ({
+const SearchBar = styled('div')(({theme}) => ({
     position: 'relative',
     borderRadius: theme.shape.borderRadius,
     backgroundColor: alpha(theme.palette.common.white, 0.15),
@@ -33,7 +32,7 @@ const SearchBar = styled('div')(({ theme }) => ({
         width: 'auto',
     },
 }));
-const SearchIconWrapper = styled('div')(({ theme }) => ({
+const SearchIconWrapper = styled('div')(({theme}) => ({
     padding: theme.spacing(0, 2),
     height: '100%',
     position: 'absolute',
@@ -42,7 +41,7 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
     alignItems: 'center',
     justifyContent: 'center',
 }));
-const StyledInputBase = styled(InputBase)(({ theme }) => ({
+const StyledInputBase = styled(InputBase)(({theme}) => ({
     color: 'inherit',
     '& .MuiInputBase-input': {
         padding: theme.spacing(1, 1, 1, 0),
@@ -102,11 +101,11 @@ class App extends react.Component {
 
                                     <SearchBar>
                                         <SearchIconWrapper>
-                                            <Search />
+                                            <Search/>
                                         </SearchIconWrapper>
                                         <StyledInputBase
                                             placeholder="Search…"
-                                            inputProps={{ 'aria-label': 'search' }}
+                                            inputProps={{'aria-label': 'search'}}
                                         />
                                     </SearchBar>
                                 </Toolbar>
@@ -125,14 +124,15 @@ class App extends react.Component {
                                         })
                                     }
                                 </Tabs>
-
-                                <Button size={"large"} vaiant={"contained"}>
-                                    Login & SignUp
-                                </Button>
+                                <Link to={"login"}>
+                                    <Button className={"noTD"} size={"large"} vaiant={"contained"} onClick={() => this.setState({tab: "login"})}>
+                                        Login & SignUp
+                                    </Button>
+                                </Link>
                             </Toolbar>
                         </AppBar>
                     </Box>
-                    <Outlet/>
+                    <Outlet changePage={this.changePage}/>
                 </Paper>
             </ThemeProvider>
         );

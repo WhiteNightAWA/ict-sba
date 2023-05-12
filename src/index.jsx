@@ -6,8 +6,9 @@ import {
     HashRouter, Route, Routes
 } from "react-router-dom";
 import Home from "./pages/Home"
-import {Buy} from "./pages/Buy";
-import {Chat} from "./pages/Chat";
+import Buy from "./pages/Buy";
+import Chat from "./pages/Chat";
+import Login from "./pages/Login";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -19,6 +20,7 @@ root.render(
                     <Route path={"/"} element={<Home />} />
                     <Route path={"/buy"} element={<Buy />} />
                     <Route path={"/chat"} element={<Chat />} />
+                    <Route path={"/login"} element={<Login />} />
                 </Route>
             </Routes>
         </HashRouter>

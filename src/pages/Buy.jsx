@@ -1,30 +1,27 @@
 import {Component} from "react";
 import {
     Container,
-    Box,
     Card,
     CardHeader,
-    Avatar,
     IconButton,
-    CardMedia,
     CardContent,
-    Typography,
-    CardAction, CardActions, Skeleton
+    CardActions, Skeleton
 } from "@mui/material";
 import {Favorite, MoreVert, Share} from "@mui/icons-material";
-import {red} from "@mui/material/colors";
+import "../styles/Buy.css"
 
-export class Buy extends Component {
+class Buy extends Component {
     render() {
         return (
             <Container sx={{
-                m: 5,
+                mt: 5,
                 display: "flex",
                 flexWrap: "wrap",
                 justifyContent: "space-around",
                 height: "85vh",
-                overflow: "auto"
-            }}>
+                overflow: "auto",
+                width: "100%"
+            }} className={"scrollBar"}>
                 {[345, 551, 642, 352, 465, 522].map((w, index) => {
                     return (<Card sx={{width: w, m: 3}} elevation={6}>
                         <CardHeader
@@ -60,3 +57,5 @@ export class Buy extends Component {
         )
     }
 }
+
+export default Buy;
