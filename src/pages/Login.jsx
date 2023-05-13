@@ -15,8 +15,8 @@ import {
 import VerificationInput from "react-verification-input";
 import "../styles/Login.css";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
-import GoogleLogo from "../res/img/Google Logo.svg";
-import {GoogleLogin} from "@react-oauth/google";
+import GoogleLoginButton from "../components/GoogleLoginButton";
+import Axios from "axios";
 
 
 class Login extends Component {
@@ -37,10 +37,14 @@ class Login extends Component {
         }
     }
 
+    componentDidMount = async () => {
+        const res = await Axios("http://localhost:3100/");
+        console.log(res.data);
+    }
 
     render() {
         return (
-            <Container>
+            <Container sx={{p: 5}}>
                 <Button onClick={() => console.log(this.state)}>state</Button>
                 <Stack spacing={5} textAlign={"center"} sx={{m: 5}} alignItems={"center"}>
                     <Collapse in={this.state.state === "login"} className={"noM"}>
@@ -175,8 +179,7 @@ class Login extends Component {
                                 <Typography color={"grey"}>
                                     By clicking the "{this.state.state==="login" ? "Login" : "Sign Up"}" button you are agreeing to the <Button
                                     variant={"text"}
-                                    href="https://whitenightawa.github.io/ict-sba/#/pp"
-                                    target="_blank"
+                                    onClick={() => window.open("https://whitenightawa.github.io/ict-sba/#/pp", "Privacy Policy", "width=700, height=400")}
                                 >Privacy Policy</Button>.
                                 </Typography>
                                 {this.state.state === "login" ? <Button variant={"outlined"} size={"large"}>
@@ -189,30 +192,7 @@ class Login extends Component {
                             <Divider sx={{width: "100%"}}>OR</Divider>
 
                             <Stack sx={{p: 3}} alignItems={"center"} spacing={2}>
-                                <GoogleLogin
-                                    onSuccess={credentialResponse => {
-                                        console.log(credentialResponse);
-                                    }}
-                                    onError={() => {
-                                        console.log('Login Failed');
-                                    }}
-                                    useOneTap
-                                />
-
-                                {/*<Card>*/}
-                                {/*    <CardActionArea sx={{display: 'flex', flexDirection: 'row'}}>*/}
-                                {/*        <CardMedia*/}
-                                {/*            component="img"*/}
-                                {/*            sx={{width: 50}}*/}
-                                {/*            image={GoogleLogo}*/}
-                                {/*        />*/}
-                                {/*        <CardContent sx={{pl: 0}}>*/}
-                                {/*            <Typography sx={{fontSize: "1.25em"}}>*/}
-                                {/*                {this.state.state === "login" ? "Login " : "SignUp "} with Google*/}
-                                {/*            </Typography>*/}
-                                {/*        </CardContent>*/}
-                                {/*    </CardActionArea>*/}
-                                {/*</Card>*/}
+                                <GoogleLoginButton state={this.state.state} logined/>
                             </Stack>
                         </CardContent>
                     </Card>
