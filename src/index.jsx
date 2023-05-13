@@ -9,21 +9,27 @@ import Home from "./pages/Home"
 import Buy from "./pages/Buy";
 import Chat from "./pages/Chat";
 import Login from "./pages/Login";
+import {GoogleOAuthProvider} from "@react-oauth/google";
+import PP from "./pages/PP";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
-        <HashRouter basename="/">
-            <Routes>
-                <Route path="/" element={<App />}>
-                    <Route path={"/"} element={<Home />} />
-                    <Route path={"/buy"} element={<Buy />} />
-                    <Route path={"/chat"} element={<Chat />} />
-                    <Route path={"/login"} element={<Login />} />
-                </Route>
-            </Routes>
-        </HashRouter>
+        <GoogleOAuthProvider clientId={"492651620125-qq34m1ql3bgdgfdncb56irfa4c43pfhp.apps.googleusercontent.com"}>
+            <HashRouter basename="/">
+                <Routes>
+                    <Route path="/" element={<App />}>
+                        <Route path={"/"} element={<Home />} />
+                        <Route path={"/buy"} element={<Buy />} />
+                        <Route path={"/chat"} element={<Chat />} />
+                        <Route path={"/login"} element={<Login />} />
+
+                        <Route path={"/pp"} element={<PP />} />
+                    </Route>
+                </Routes>
+            </HashRouter>
+        </GoogleOAuthProvider>
     </React.StrictMode>
 );
 

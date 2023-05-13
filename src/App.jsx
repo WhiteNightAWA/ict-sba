@@ -88,8 +88,8 @@ class App extends react.Component {
 
     render() {
         return (
-            <ThemeProvider theme={this.state.darkMode.theme}>
-                <Paper style={{height: "100vh", borderRadius: 0}}>
+            <ThemeProvider theme={this.state.darkMode.theme} className={"test"}>
+                <Paper style={{minHeight: "100vh", height: "100%", borderRadius: 0}}>
                     <Box sx={{flexGrow: 1}}>
                         <AppBar position="static">
                             <Toolbar sx={{justifyContent: "space-between"}}>
