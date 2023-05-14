@@ -27,19 +27,35 @@ class Login extends Component {
             state: "login",
             showPassword: false,
             username: "",
-            email: "",
             verification: "",
             password: "",
             passwordSure: "",
+
+            // email ver
+            email: "",
             enableSendCode: true,
             sb: false,
-            leftTime: 60
+            leftTime: 60,
+            emailCorrect: true,
+            sendingMail: false,
         }
     }
 
-    componentDidMount = async () => {
-        const res = await Axios("http://localhost:3100/");
-        console.log(res.data);
+    sendEmail = async () => {
+        this.setState({sendingMail: true, enableSendCode: false});
+
+        let res = await Axios("http://localhost:3100/auth/code", {
+            email: this.state.email
+        })
+
+        console.log(res);
+
+        // this.setState({sb: true, enableSendCode: false});
+        // for (const i of [...Array(60).keys()].reverse()) {
+        //     this.setState({leftTime: i});
+        //     await new Promise(r => setTimeout(r, 1000));
+        // }
+        this.setState({enableSendCode: true});
     }
 
     render() {
@@ -92,6 +108,15 @@ class Login extends Component {
                                     fullWidth
                                     value={this.state.email}
                                     onChange={(e) => this.setState({email: e.target.value})}
+                                    onBlur={(e) => {
+                                        let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+                                        let r = re.test(this.state.email);
+                                        this.setState({
+                                            emailCorrect: r
+                                        });
+                                    }}
+                                    error={!this.state.emailCorrect}
+                                    helperText={this.state.emailCorrect?"":"Invalid Email"}
                                 />
                                 <Collapse in={this.state.state === "signup"} className={"noM"}>
                                     <Box sx={{mt: 2}}/>
@@ -109,20 +134,17 @@ class Login extends Component {
                                             onChange={(v) => this.setState({verification: v})}
                                         />
                                         <Button
-                                            onClick={async () => {
-                                                this.setState({sb: true, enableSendCode: false});
-                                                for (const i of [...Array(60).keys()].reverse()) {
-                                                    this.setState({leftTime: i});
-                                                    await new Promise(r => setTimeout(r, 1000));
-                                                }
-                                                this.setState({enableSendCode: true});
-                                            }}
-                                            disabled={!this.state.email || !this.state.enableSendCode}
+                                            onClick={this.sendEmail}
+                                            disabled={!this.state.email || !this.state.enableSendCode || !this.state.emailCorrect ||
+                                                !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.state.email)}
                                         >
                                             {this.state.enableSendCode ? "Get Code" : `${this.state.leftTime}S`}
                                         </Button>
-                                        <Snackbar anchorOrigin={{horizontal: "right", vertical: "bottom"}} open={this.state.sb} autoHideDuration={10000} onClose={() => this.setState({sb: false})}>
-                                            <Alert onClose={() => this.setState({sb: false})} severity="success" sx={{ width: '100%' }}>
+                                        <Snackbar anchorOrigin={{horizontal: "right", vertical: "bottom"}}
+                                                  open={this.state.sb} autoHideDuration={10000}
+                                                  onClose={() => this.setState({sb: false})}>
+                                            <Alert onClose={() => this.setState({sb: false})} severity="success"
+                                                   sx={{width: '100%'}}>
                                                 Mail sent!
                                             </Alert>
                                         </Snackbar>
@@ -177,7 +199,8 @@ class Login extends Component {
                                     </FormControl>
                                 </Collapse>
                                 <Typography color={"grey"}>
-                                    By clicking the "{this.state.state==="login" ? "Login" : "Sign Up"}" button you are agreeing to the <Button
+                                    By clicking the "{this.state.state === "login" ? "Login" : "Sign Up"}" button you
+                                    are agreeing to the <Button
                                     variant={"text"}
                                     onClick={() => window.open("https://whitenightawa.github.io/ict-sba/#/pp", "Privacy Policy", "width=700, height=400")}
                                 >Privacy Policy</Button>.
