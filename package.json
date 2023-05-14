@@ -8,6 +8,7 @@
     "@emotion/styled": "^11.11.0",
     "@fontsource/roboto": "^4.5.8",
     "@mui/icons-material": "^5.11.16",
+    "@mui/lab": "^5.0.0-alpha.129",
     "@mui/material": "^5.12.3",
     "@mui/material-next": "6.0.0-alpha.84",
     "@mui/styled-engine-sc": "^5.12.0",

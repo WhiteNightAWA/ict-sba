@@ -9,9 +9,10 @@ import {
     Stack,
     TextField,
     ToggleButton,
-    ToggleButtonGroup,
+    ToggleButtonGroup, FormHelperText,
     Typography
 } from "@mui/material";
+import { LoadingButton } from '@mui/lab';
 import VerificationInput from "react-verification-input";
 import "../styles/Login.css";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
@@ -35,6 +36,8 @@ class Login extends Component {
             email: "",
             enableSendCode: true,
             sb: false,
+            sbS: "",
+            sbMsg: "",
             leftTime: 60,
             emailCorrect: true,
             sendingMail: false,
@@ -43,18 +46,23 @@ class Login extends Component {
 
     sendEmail = async () => {
         this.setState({sendingMail: true, enableSendCode: false});
+        try {
+            let res = await Axios.post("https://p01--server--p5rzjcrgjpvy.code.run/auth/code", {
+                email: this.state.email
+            });
 
-        let res = await Axios("http://localhost:3100/auth/code", {
-            email: this.state.email
-        })
+            this.setState({sb: true, sbS: res.data.severify, sbMsg: res.data.msg, sendingMail: false});
+        } catch (e) {
+            let res = e.response;
 
-        console.log(res);
+            this.setState({sb: true, sbS: res.data.severify, sbMsg: res.data.msg, sendingMail: false});
+        }
 
-        // this.setState({sb: true, enableSendCode: false});
-        // for (const i of [...Array(60).keys()].reverse()) {
-        //     this.setState({leftTime: i});
-        //     await new Promise(r => setTimeout(r, 1000));
-        // }
+
+        for (const i of [...Array(60).keys()].reverse()) {
+            this.setState({leftTime: i});
+            await new Promise(r => setTimeout(r, 1000));
+        }
         this.setState({enableSendCode: true});
     }
 
@@ -133,19 +141,20 @@ class Login extends Component {
                                             value={this.state.verification}
                                             onChange={(v) => this.setState({verification: v})}
                                         />
-                                        <Button
+                                        <LoadingButton
+                                            loading={this.state.sendingMail}
                                             onClick={this.sendEmail}
                                             disabled={!this.state.email || !this.state.enableSendCode || !this.state.emailCorrect ||
                                                 !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.state.email)}
                                         >
                                             {this.state.enableSendCode ? "Get Code" : `${this.state.leftTime}S`}
-                                        </Button>
+                                        </LoadingButton>
                                         <Snackbar anchorOrigin={{horizontal: "right", vertical: "bottom"}}
                                                   open={this.state.sb} autoHideDuration={10000}
                                                   onClose={() => this.setState({sb: false})}>
-                                            <Alert onClose={() => this.setState({sb: false})} severity="success"
+                                            <Alert onClose={() => this.setState({sb: false})} severity={this.state.sbS}
                                                    sx={{width: '100%'}}>
-                                                Mail sent!
+                                                {this.state.sbMsg}
                                             </Alert>
                                         </Snackbar>
                                     </Stack>
@@ -175,12 +184,14 @@ class Login extends Component {
 
                                 <Collapse in={this.state.state === "signup"} sx={{width: "100%"}} className={"noM"}>
                                     <Box sx={{mt: 2}}/>
-                                    <FormControl variant="outlined" sx={{width: "100%"}}>
+                                    <FormControl
+                                        error={this.state.password !== this.state.passwordSure} variant="outlined" sx={{width: "100%"}}>
                                         <InputLabel htmlFor="login-password-sure">Repeat Password</InputLabel>
                                         <OutlinedInput
                                             fullWidth
                                             id="login-password-sure"
                                             type={this.state.showPassword ? "text" : "password"}
+                                            error={this.state.password !== this.state.passwordSure}
                                             endAdornment={
                                                 <InputAdornment position="end">
                                                     <IconButton
@@ -196,6 +207,8 @@ class Login extends Component {
                                             value={this.state.passwordSure}
                                             onChange={(e) => this.setState({passwordSure: e.target.value})}
                                         />
+                                        <FormHelperText
+                                            error={this.state.password !== this.state.passwordSure}>{this.state.password===this.state.passwordSure?"":"Password didn't match!"}</FormHelperText>
                                     </FormControl>
                                 </Collapse>
                                 <Typography color={"grey"}>
