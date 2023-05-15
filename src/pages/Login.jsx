@@ -12,7 +12,7 @@ import {
     ToggleButtonGroup, FormHelperText,
     Typography
 } from "@mui/material";
-import { LoadingButton } from '@mui/lab';
+import {LoadingButton} from '@mui/lab';
 import VerificationInput from "react-verification-input";
 import "../styles/Login.css";
 import {Visibility, VisibilityOff} from "@mui/icons-material";
@@ -26,21 +26,26 @@ class Login extends Component {
 
         this.state = {
             state: "login",
+            email: "",
+            password: "",
             showPassword: false,
+
+            // register
             username: "",
             verification: "",
-            password: "",
             passwordSure: "",
+            registering: false,
 
             // email ver
-            email: "",
             enableSendCode: true,
-            sb: false,
-            sbS: "",
-            sbMsg: "",
             leftTime: 60,
             emailCorrect: true,
             sendingMail: false,
+
+            // sb
+            sb: false,
+            sbS: "",
+            sbMsg: "",
         }
     }
 
@@ -65,6 +70,16 @@ class Login extends Component {
         }
         this.setState({enableSendCode: true});
     }
+    register = async () => {
+        const {username, email, verification: code, password} = this.state;
+        this.setState({
+            registering: true,
+        });
+        console.log(username, email, code, password);
+
+
+    }
+
 
     render() {
         return (
@@ -117,6 +132,7 @@ class Login extends Component {
                                     value={this.state.email}
                                     onChange={(e) => this.setState({email: e.target.value})}
                                     onBlur={(e) => {
+                                        // eslint-disable-next-line
                                         let re = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
                                         let r = re.test(this.state.email);
                                         this.setState({
@@ -124,7 +140,7 @@ class Login extends Component {
                                         });
                                     }}
                                     error={!this.state.emailCorrect}
-                                    helperText={this.state.emailCorrect?"":"Invalid Email"}
+                                    helperText={this.state.emailCorrect ? "" : "Invalid Email"}
                                 />
                                 <Collapse in={this.state.state === "signup"} className={"noM"}>
                                     <Box sx={{mt: 2}}/>
@@ -145,6 +161,7 @@ class Login extends Component {
                                             loading={this.state.sendingMail}
                                             onClick={this.sendEmail}
                                             disabled={!this.state.email || !this.state.enableSendCode || !this.state.emailCorrect ||
+                                                // eslint-disable-next-line
                                                 !/^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.state.email)}
                                         >
                                             {this.state.enableSendCode ? "Get Code" : `${this.state.leftTime}S`}
@@ -152,7 +169,8 @@ class Login extends Component {
                                         <Snackbar anchorOrigin={{horizontal: "right", vertical: "bottom"}}
                                                   open={this.state.sb} autoHideDuration={10000}
                                                   onClose={() => this.setState({sb: false})}>
-                                            <Alert onClose={() => this.setState({sb: false})} severity={this.state.sbS}
+                                            <Alert onClose={() => this.setState({sb: false})}
+                                                   severity={this.state.sbS}
                                                    sx={{width: '100%'}}>
                                                 {this.state.sbMsg}
                                             </Alert>
@@ -185,7 +203,8 @@ class Login extends Component {
                                 <Collapse in={this.state.state === "signup"} sx={{width: "100%"}} className={"noM"}>
                                     <Box sx={{mt: 2}}/>
                                     <FormControl
-                                        error={this.state.password !== this.state.passwordSure} variant="outlined" sx={{width: "100%"}}>
+                                        error={this.state.password !== this.state.passwordSure} variant="outlined"
+                                        sx={{width: "100%"}}>
                                         <InputLabel htmlFor="login-password-sure">Repeat Password</InputLabel>
                                         <OutlinedInput
                                             fullWidth
@@ -208,11 +227,12 @@ class Login extends Component {
                                             onChange={(e) => this.setState({passwordSure: e.target.value})}
                                         />
                                         <FormHelperText
-                                            error={this.state.password !== this.state.passwordSure}>{this.state.password===this.state.passwordSure?"":"Password didn't match!"}</FormHelperText>
+                                            error={this.state.password !== this.state.passwordSure}>{this.state.password === this.state.passwordSure ? "" : "Password didn't match!"}</FormHelperText>
                                     </FormControl>
                                 </Collapse>
                                 <Typography color={"grey"}>
-                                    By clicking the "{this.state.state === "login" ? "Login" : "Sign Up"}" button you
+                                    By clicking the "{this.state.state === "login" ? "Login" : "Sign Up"}" button
+                                    you
                                     are agreeing to the <Button
                                     variant={"text"}
                                     onClick={() => window.open("https://whitenightawa.github.io/ict-sba/#/pp", "Privacy Policy", "width=700, height=400")}
@@ -220,15 +240,20 @@ class Login extends Component {
                                 </Typography>
                                 {this.state.state === "login" ? <Button variant={"outlined"} size={"large"}>
                                     Login
-                                </Button> : <Button variant={"contained"} size={"large"}>
+                                </Button> : <LoadingButton variant={"contained"} size={"large"} disabled={
+                                    !(this.state.username && this.state.email && this.state.verification && this.state.password && this.state.passwordSure
+                                        && (this.state.password === this.state.passwordSure)
+                                        // eslint-disable-next-line
+                                        && /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/.test(this.state.email)
+                                    )
+                                } onClick={this.register} loading={this.state.registering}>
                                     Sign Up
-                                </Button>}
+                                </LoadingButton>}
                             </Stack>
-
                             <Divider sx={{width: "100%"}}>OR</Divider>
 
                             <Stack sx={{p: 3}} alignItems={"center"} spacing={2}>
-                                <GoogleLoginButton state={this.state.state} logined/>
+                                <GoogleLoginButton disabled={this.state.registering} state={this.state.state} logined/>
                             </Stack>
                         </CardContent>
                     </Card>

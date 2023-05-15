@@ -9,10 +9,12 @@ function GoogleLoginButton(props) {
 	});
 
 	return (
-		<Card onClick={googleLogin} sx={{
-			boxShadow: ""
-		}}>
-			<CardActionArea sx={{display: 'flex', flexDirection: 'row'}}>
+		<Card onClick={ props.disabled ? ()=>{} : googleLogin} sx={{
+			boxShadow: "",
+			filter: props.disabled ? "grayscale(1) contrast(0.85)" : "",
+			color: props.disabled ? "grey" : ""
+		}} >
+			<CardActionArea disabled={props.disabled} sx={{display: 'flex', flexDirection: 'row'}}>
 				<CardMedia
 					component="img"
 					sx={{width: 50}}
