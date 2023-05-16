@@ -51,33 +51,40 @@ class Login extends Component {
 
     sendEmail = async () => {
         this.setState({sendingMail: true, enableSendCode: false});
+        let res;
         try {
-            let res = await Axios.post("https://p01--server--p5rzjcrgjpvy.code.run/auth/code", {
+            res = await Axios.post("https://p01--server--p5rzjcrgjpvy.code.run/auth/code", {
                 email: this.state.email
             });
-
-            this.setState({sb: true, sbS: res.data.severify, sbMsg: res.data.msg, sendingMail: false});
-        } catch (e) {
-            let res = e.response;
-
-            this.setState({sb: true, sbS: res.data.severify, sbMsg: res.data.msg, sendingMail: false});
+        } catch (err) {
+            res = err.response;
         }
-
+       
+        this.setState({sb: true, sbS: res.data.severify, sbMsg: res.data.msg, sendingMail: false});
 
         for (const i of [...Array(60).keys()].reverse()) {
             this.setState({leftTime: i});
             await new Promise(r => setTimeout(r, 1000));
         }
         this.setState({enableSendCode: true});
-    }
+    };
+    
     register = async () => {
         const {username, email, verification: code, password} = this.state;
         this.setState({
             registering: true,
         });
         console.log(username, email, code, password);
-
-
+        let res;
+        try {
+            res = await Axios.post("https://p01--server--p5rzjcrgjpvy.code.run/auth/register", {
+                username, email, code, password
+            };
+        } catch (err) {
+            res = err.response;
+        }
+        
+        console.log(res);
     }
 
 
