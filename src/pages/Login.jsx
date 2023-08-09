@@ -77,20 +77,72 @@ class Login extends Component {
         console.log(username, email, code, password);
         let res;
         try {
-            res = await Axios.post("https://p01--server--p5rzjcrgjpvy.code.run/auth/register", {
+            res = await Axios.post("http://localhost:3100/auth/register", {
                 username, email, code, password
-            };
+            });
         } catch (err) {
             res = err.response;
         }
+        if (res.status === 200) {
+            this.setState({
+                registering: false,
+                sb: true, sbS: "success", sbMsg: res.data.msg,
+                state: "login"
+            });
+            this.login();
+        } else {
+            this.setState({
+                registering: false,
+                sb: true, sbS: "error", sbMsg: res.data.error_description
+            });
+        }
         
         console.log(res);
+    }
+
+    login = async () => {
+        const { email, password } = this.state;
+
+        this.setState({
+            registering: true,
+        });
+        
+        let res;
+        try {
+            res = await Axios.post("http://localhost:3100/auth/login", {
+                email, password
+            });
+        } catch (err) {
+            res = err.response;
+        }
+
+        console.log(res);
+        if (res.status === 200) {
+    
+            this.setState({
+                registering: false,
+            });
+        } else {
+            this.setState({
+                registering: false,
+                sb: true, sbS: "error", sbMsg: res.data.error_description
+            });
+        }
     }
 
 
     render() {
         return (
             <Container sx={{p: 5}}>
+                <Snackbar anchorOrigin={{horizontal: "right", vertical: "bottom"}}
+                                                  open={this.state.sb} autoHideDuration={10000}
+                                                  onClose={() => this.setState({sb: false})}>
+                                            <Alert onClose={() => this.setState({sb: false})}
+                                                   severity={this.state.sbS}
+                                                   sx={{width: '100%'}}>
+                                                {this.state.sbMsg}
+                                            </Alert>
+                                        </Snackbar>
                 <Button onClick={() => console.log(this.state)}>state</Button>
                 <Stack spacing={5} textAlign={"center"} sx={{m: 5}} alignItems={"center"}>
                     <Collapse in={this.state.state === "login"} className={"noM"}>
@@ -173,15 +225,6 @@ class Login extends Component {
                                         >
                                             {this.state.enableSendCode ? "Get Code" : `${this.state.leftTime}S`}
                                         </LoadingButton>
-                                        <Snackbar anchorOrigin={{horizontal: "right", vertical: "bottom"}}
-                                                  open={this.state.sb} autoHideDuration={10000}
-                                                  onClose={() => this.setState({sb: false})}>
-                                            <Alert onClose={() => this.setState({sb: false})}
-                                                   severity={this.state.sbS}
-                                                   sx={{width: '100%'}}>
-                                                {this.state.sbMsg}
-                                            </Alert>
-                                        </Snackbar>
                                     </Stack>
                                 </Collapse>
                                 <FormControl variant="outlined" sx={{width: "100%"}}>
@@ -245,9 +288,15 @@ class Login extends Component {
                                     onClick={() => window.open("https://whitenightawa.github.io/ict-sba/#/pp", "Privacy Policy", "width=700, height=400")}
                                 >Privacy Policy</Button>.
                                 </Typography>
-                                {this.state.state === "login" ? <Button variant={"outlined"} size={"large"}>
+                                {this.state.state === "login" ? <LoadingButton 
+                                    variant={"outlined"} 
+                                    size={"large"}
+                                    disabled={!(this.state.email && this.state.password)}
+                                    onClick={this.login}
+                                    loading={this.state.registering}
+                                >
                                     Login
-                                </Button> : <LoadingButton variant={"contained"} size={"large"} disabled={
+                                </LoadingButton> : <LoadingButton variant={"contained"} size={"large"} disabled={
                                     !(this.state.username && this.state.email && this.state.verification && this.state.password && this.state.passwordSure
                                         && (this.state.password === this.state.passwordSure)
                                         // eslint-disable-next-line
