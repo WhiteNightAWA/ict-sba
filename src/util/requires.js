@@ -2,7 +2,7 @@ import Axios from "axios";
 import cookie from "react-cookies";
 
 
-let url = !process.env.NODE_ENV || process.env.NODE_ENV === "development" ? "http://localhost:3100" : "https://p-01--server--p5rzjcrgjpvy.code.run";
+let url = !process.env.NODE_ENV || process.env.NODE_ENV === "development" ? "http://localhost:3100" : "https://p01--server--p5rzjcrgjpvy.code.run";
 
 
 
