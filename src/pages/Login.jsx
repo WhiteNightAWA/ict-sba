@@ -51,19 +51,8 @@ class Login extends Component {
 
             // Google
             page: "login",
-            google: {
-                access_token: "ya29.a0AfB_byBr5boPPAIR1Ettq9tz9U0qyq4X-r-IgliUoIpgVIZDVADykKvWRr8SE7WJnjaMhp7vVDnlrIJ-Eo-8mej1CEK-LBEHyLhg-ex6c9JdYCwFhPiqoJQHFtD-ZoRuWr0rg1hsdyR2GU9ff3-_yGMIY8rkHOwaCgYKAVUSARISFQHsvYls7IEXuAnNAHfKvWGeJ2QUIg0166"
-            },
-            googleData: {
-                "sub": "110046593629731974860",
-                "name": "seven eighty (87)",
-                "given_name": "seven",
-                "family_name": "eighty",
-                "picture": "https://lh3.googleusercontent.com/a/AAcHTtf7_Sjyve5qG_RDpx2l7g6lz5uGT27tCoJXglUrraM-f7E=s96-c",
-                "email": "s121101.evantang.2015@gmail.com",
-                "email_verified": true,
-                "locale": "zh-TW"
-            },
+            google: {},
+            googleData: {            },
         }
     }
 
