@@ -50,7 +50,7 @@ class Login extends Component {
             sbMsg: "",
 
             // Google
-            page: "login",
+            page: "normal",
             google: {},
             googleData: {            },
         }
