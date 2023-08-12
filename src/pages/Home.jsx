@@ -28,7 +28,7 @@ class Home extends Component {
         return (
             <Stack sx={{textAlign: "center", margin: "5em"}} spacing={3}>
                 <Typography variant={"h1"}>
-                    Welcome to [Name]
+                    Welcome to 買D餸
                 </Typography>
                 <Typography variant={"h6"} color={"grey"}>
                     Description. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Debitis dolores rem

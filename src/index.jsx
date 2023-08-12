@@ -14,6 +14,8 @@ import PP from "./pages/PP";
 
 import { AuthProvider } from 'react-auth-kit'
 import {GoogleOAuthProvider} from "@react-oauth/google";
+import Shop from "./pages/Shop";
+import NotFound from "./pages/NotFound";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -25,15 +27,17 @@ root.render(
                       cookieSecure={window.location.protocol === "https:"}>
 
             <GoogleOAuthProvider clientId={"492651620125-qq34m1ql3bgdgfdncb56irfa4c43pfhp.apps.googleusercontent.com"}>
-                <HashRouter basename="/">
+                <HashRouter>
                     <Routes>
                         <Route path="/" element={<App />}>
-                            <Route path={"/"} element={<Home />} />
-                            <Route path={"/buy"} element={<Buy />} />
-                            <Route path={"/chat"} element={<Chat />} />
-                            <Route path={"/login"} element={<Login />} />
+                            <Route path={""} element={<Home />} />
+                            <Route path={"buy"} element={<Buy />} />
+                            <Route path={"chat"} element={<Chat />} />
+                            <Route path={"login"} element={<Login />} />
+                            <Route path={"shop"} element={<Shop />} />
 
-                            <Route path={"/pp"} element={<PP />} />
+                            <Route path={"*"} element={<NotFound />} />
+                            <Route path={"pp"} element={<PP />} />
                         </Route>
                     </Routes>
                 </HashRouter>
