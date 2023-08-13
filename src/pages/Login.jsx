@@ -55,11 +55,10 @@ class Login extends Component {
             googleData: {            },
         }
     }
-
     async componentDidMount() {
         let res = await Requires.get("/users/test");
         if (res.status === 200) {
-            console.log("logined");
+            window.location.href = "/#/";
         }
     }
 

@@ -7,15 +7,14 @@ import {
 } from "react-router-dom";
 import Home from "./pages/Home"
 import Buy from "./pages/Buy";
-import Chat from "./pages/Chat";
 import Login from "./pages/Login";
 import PP from "./pages/PP";
+import Shop from "./pages/Shop";
+import NotFound from "./pages/NotFound";
 
 
 import { AuthProvider } from 'react-auth-kit'
 import {GoogleOAuthProvider} from "@react-oauth/google";
-import Shop from "./pages/Shop";
-import NotFound from "./pages/NotFound";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -32,9 +31,9 @@ root.render(
                         <Route path="/" element={<App />}>
                             <Route path={""} element={<Home />} />
                             <Route path={"buy"} element={<Buy />} />
-                            <Route path={"chat"} element={<Chat />} />
                             <Route path={"login"} element={<Login />} />
                             <Route path={"shop"} element={<Shop />} />
+
 
                             <Route path={"*"} element={<NotFound />} />
                             <Route path={"pp"} element={<PP />} />

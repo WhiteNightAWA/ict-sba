@@ -119,7 +119,8 @@ class AppBar extends Component {
             if (res.data.type === "sell") {
                 this.setState({
                     tabs: [
-                        ...this.state.tabs,
+                        ["主頁", <Home/>, "home"],
+                        ["BUY", <LocalMall/>, "buy"],
                         ["My Shop", <Storefront/>, "shop"],
                     ]
                 })
@@ -180,7 +181,7 @@ class AppBar extends Component {
         }
     }
     async done () {
-        if (!(this.state.settingVal === "sell" && !(this.state.fn && this.state.ln && String(this.checkHKID(this.state.HKID)) === this.state.vat.toString() && this.state.shopname && !this.state.position.includes(-1)))) {
+        if (!(this.state.settingVal === "sell" && !(this.state.fn && this.state.ln && String(this.checkHKID(this.state.HKID)) === this.state.vat.toString() && this.state.shopName && !this.state.position.includes(-1)))) {
             this.setState({doneing: true});
             const res = await Requires.post("/users/done", {
                 type: this.state.settingVal,
@@ -308,8 +309,8 @@ class AppBar extends Component {
                                             <TextField
                                                 required
                                                 label="Shop name"
-                                                value={this.state.shopname}
-                                                onChange={(e) => this.setState({shopname: e.target.value})}
+                                                value={this.state.shopName}
+                                                onChange={(e) => this.setState({shopName: e.target.value})}
                                             />
                                         </Stack>
                                         {this.state.position.includes(-1) ?
@@ -333,7 +334,7 @@ class AppBar extends Component {
                             !(
                                 this.state.fn && this.state.ln &&
                                 String(this.checkHKID(this.state.HKID)) === this.state.vat.toString() &&
-                                this.state.shopname &&
+                                this.state.shopName &&
                                 !this.state.position.includes(-1)
                             )
                         } variant={"contained"} onClick={async () => await this.done()}>
