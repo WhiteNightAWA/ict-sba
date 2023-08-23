@@ -102,6 +102,7 @@ class AppBar extends Component {
             gettingLocation: false,
             position: [-1, -1],
             HKID: "",
+            phone: "",
             vat: "",
             doneing: false,
 
@@ -122,10 +123,13 @@ class AppBar extends Component {
                         ["主頁", <Home/>, "home"],
                         ["BUY", <LocalMall/>, "buy"],
                         ["My Shop", <Storefront/>, "shop"],
-                    ]
+                    ],
+                    tab: window.location.hash.split("/").pop()
                 })
             }
         }
+
+        
     }
 
     async logout() {
@@ -142,6 +146,7 @@ class AppBar extends Component {
             });
             navigator.geolocation.getCurrentPosition(position => {
                 positions = [position.coords.longitude, position.coords.latitude]
+                console.log(positions)
                 this.setState({
                     gettingLocation: false,
                     position: positions
@@ -313,16 +318,44 @@ class AppBar extends Component {
                                                 onChange={(e) => this.setState({shopName: e.target.value})}
                                             />
                                         </Stack>
+                                        <Stack direction={"row"} spacing={2}>
+                                            
+                                    
+                                        <TextField
+                                            variant={"outlined"}
+                                            type={"number"}
+                                            sx={{
+                                                width: "14em"
+                                            }}
+                                            error={this.state.phone > 99999999 || this.state.phone < 10000000}
+                                            placeholder={"Phone Number"}
+                                            value={this.state.phone}
+                                            onChange={(e) => this.setState({
+                                                phone: e.target.value,
+                                            })}
+                                            disabled={this.state.loading}
+                                            InputProps={{
+                                                startAdornment: <InputAdornment position="start">+852 </InputAdornment>,
+                                            }}
+                                        />
                                         {this.state.position.includes(-1) ?
-                                            <LoadingButton loading={this.state.gettingLocation} fullWidth
+                                            <LoadingButton loading={this.state.gettingLocation} 
+                                                            sx={{
+                                                                width: "16em"
+                                                            }}
                                                            onClick={async () => await this.getLocation()}>
                                                 Get my location
                                             </LoadingButton> :
-                                            <Typography color={"grey"} display={"flex"} flexDirection={"column"}
+                                            <Typography 
+                                            sx={{
+                                                width: "14em"
+                                            }}
+                                            color={"grey"} display={"flex"} flexDirection={"column"}
                                                         alignItems={"center"}>
                                                 <Check color={"success"}/>
                                                 {this.state.position.toString()}
                                             </Typography>}
+                                        </Stack>
                                     </Stack>
                                 </Paper>
                             </Collapse>
@@ -335,7 +368,8 @@ class AppBar extends Component {
                                 this.state.fn && this.state.ln &&
                                 String(this.checkHKID(this.state.HKID)) === this.state.vat.toString() &&
                                 this.state.shopName &&
-                                !this.state.position.includes(-1)
+                                !this.state.position.includes(-1) &&
+                                this.state.phone
                             )
                         } variant={"contained"} onClick={async () => await this.done()}>
                             Done

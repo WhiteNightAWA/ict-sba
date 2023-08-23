@@ -27,6 +27,7 @@ export default class Shop extends Component {
 
         this.state = {
             user: {},
+            shop: {},
             imgIndex: 0,
             editing: false,
             loading: false,
@@ -46,9 +47,18 @@ export default class Shop extends Component {
             if (res.data.type !== "sell") {
                 window.location.href = "/#/";
             } else {
-                this.setState({
-                    user: {...res.data},
-                })
+                let shopRes = await Requires.get("/shops/get/"+res.data.shop.toString())
+                
+                if (shopRes.status === 200) {
+                    this.setState({
+                        user: {...res.data},
+                        shop: {...shopRes.data},
+                    })
+                    console.log(this.state)
+                } else {
+                    window.location.href = "/#/";
+                }
+
             }
         } else {
             window.location.href = "/#/login";
@@ -80,7 +90,7 @@ export default class Shop extends Component {
             loading: true,
         });
 
-        const res = await Requires.post("/users/update", this.state.user);
+        const res = await Requires.post("/users/update", this.state.shop);
 
         if (res.status === 200) {
             this.setState({
@@ -125,13 +135,13 @@ export default class Shop extends Component {
                         minWidth: "80vw"
                     }}>
                         {
-                            (this.state.user.shopData?.shopPhotos?.length !== 0 || this.state.editing) &&
+                            (this.state.shop.shopPhotos?.length !== 0 || this.state.editing) &&
                             <Box sx={{position: 'relative', filter: "drop-shadow(2px 4px 6px black)"}}>
                                 <AutoPlaySwipeableViews index={this.state.imgIndex}
                                                         onChangeIndex={(i) => this.setState({imgIndex: i})}
                                 >
                                     {
-                                        this.state.user.shopData?.shopPhotos?.map((url, index) => {
+                                        this.state.shop.shopPhotos?.map((url, index) => {
                                             return (
                                                 <CardMedia
                                                     key={index}
@@ -142,41 +152,37 @@ export default class Shop extends Component {
                                         })
                                     }
                                 </AutoPlaySwipeableViews>
-                                <Pagination dots={this.state.user.shopData?.shopPhotos?.length}
+                                <Pagination dots={this.state.shop.shopPhotos?.length}
                                             index={this.state.imgIndex}
                                             onChangeIndex={(i) => this.setState({imgIndex: i})}/>
                                 {this.state.editing && <Box sx={{p: 1}}>
                                     {
-                                        this.state.user.shopData?.shopPhotos?.map((img, index) => {
+                                        this.state.shop.shopPhotos?.map((img, index) => {
                                             return (<><TextField
                                                 variant={"standard"}
                                                 value={img}
                                                 key={index}
-                                                sx={{width: "95%"}}
+                                                sx={{width: "93%"}}
                                                 onChange={(e) => {
-                                                    let photos = this.state.user.shopData?.shopPhotos;
+                                                    let photos = this.state.shop.shopPhotos;
                                                     photos[index] = e.target.value;
                                                     this.setState({
-                                                        user: {
-                                                            ...this.state.user, shopData: {
-                                                                ...this.state.user.shopData,
-                                                                shopPhotos: photos,
-                                                            },
+                                                        shop: {
+                                                            ...this.state.shop, 
+                                                            shopPhotos: photos,
                                                         }
                                                     });
                                                 }}
                                             /><IconButton color={"error"} onClick={() => {
-                                                let photos = this.state.user.shopData?.shopPhotos;
+                                                let photos = this.state.shop.shopPhotos;
                                                 if (index > -1) {
                                                     photos.splice(index, 1);
                                                 }
                                                 this.setState({
-                                                    user: {
-                                                        ...this.state.user, shopData: {
-                                                            ...this.state.user.shopData,
-                                                            shopPhotos: photos,
-                                                        },
-                                                    },
+                                                    shop: {
+                                                        ...this.state.shop, 
+                                                        shopPhotos: photos,
+                                                    }
                                                 });
                                             }}>
                                                 <Clear/>
@@ -184,14 +190,12 @@ export default class Shop extends Component {
                                         })
                                     }
                                     <Button fullWidth color={"success"} variant={"outlined"} onClick={() => {
-                                        let photos = this.state.user.shopData?.shopPhotos;
+                                        let photos = this.state.shop.shopPhotos;
                                         photos.push("");
                                         this.setState({
-                                            user: {
-                                                ...this.state.user, shopData: {
-                                                    ...this.state.user.shopData,
-                                                    shopPhotos: photos,
-                                                },
+                                            shop: {
+                                                ...this.state.shop, 
+                                                shopPhotos: photos,
                                             }
                                         });
                                     }}>Add Image</Button>
@@ -217,27 +221,25 @@ export default class Shop extends Component {
                                                 borderRadius: "5px",
                                             }}
                                             size={"small"}
-                                            value={this.state.user.shopData?.avatar}
+                                            value={this.state.shop.avatar}
                                             onChange={(e) => this.setState({
-                                                user: {
-                                                    ...this.state.user, shopData: {
-                                                        ...this.state.user.shopData,
-                                                        avatar: e.target.value,
-                                                    },
+                                                shop: {
+                                                    ...this.state.shop, 
+                                                    avatar: e.target.value,
                                                 }
                                             })}
                                         />
                                         <Avatar
-                                            src={this.state.user.shopData?.avatar}
-                                            alt={this.state.user.shopData?.shopName}
+                                            src={this.state.shop.avatar}
+                                            alt={this.state.shop.shopName}
                                             sx={{
                                                 height: "8em",
                                                 width: "8em"
                                             }}
                                         />
                                     </Box> : <Avatar
-                                        src={this.state.user.shopData?.avatar}
-                                        alt={this.state.user.shopData?.shopName}
+                                        src={this.state.shop.avatar}
+                                        alt={this.state.shop.shopName}
                                         sx={{
                                             height: "8em",
                                             width: "8em"
@@ -255,20 +257,18 @@ export default class Shop extends Component {
                                                     sx={{
                                                         fontSize: "0.75em"
                                                     }}
-                                                    value={this.state.user.shopData?.shopName}
+                                                    value={this.state.shop.shopName}
                                                     onChange={(e) => this.setState({
-                                                        user: {
-                                                            ...this.state.user, shopData: {
-                                                                ...this.state.user.shopData,
-                                                                shopName: e.target.value,
-                                                            },
+                                                        shop: {
+                                                            ...this.state.shop, 
+                                                            shopName: e.target.value,
                                                         }
                                                     })}
                                                     disabled={this.state.loading}
                                                 >
                                                     Description
                                                 </OutlinedInput> :
-                                                this.state.user.shopData?.shopName
+                                                this.state.shop.shopName
                                             }
                                         </Typography>
 
@@ -279,20 +279,18 @@ export default class Shop extends Component {
                                                 {this.state.editing ? <OutlinedInput
                                                         size={"small"}
                                                         placeholder={"店鋪類型, e.g. 肉店..."}
-                                                        value={this.state.user.shopData?.short}
+                                                        value={this.state.shop.short}
                                                         onChange={(e) => this.setState({
-                                                            user: {
-                                                                ...this.state.user, shopData: {
-                                                                    ...this.state.user.shopData,
-                                                                    short: e.target.value,
-                                                                },
+                                                            shop: {
+                                                                ...this.state.shop,
+                                                                short: e.target.value,
                                                             }
                                                         })}
                                                         disabled={this.state.loading}
                                                     >
                                                         Description
                                                     </OutlinedInput> :
-                                                    this.state.user.shopData?.short}
+                                                    this.state.shop.short}
                                             </Typography>
                                             <Stack direction={"row"} alignItems={"center"}>
                                                 <LocalPhone/>
@@ -301,25 +299,21 @@ export default class Shop extends Component {
                                                         size={"small"}
                                                         variant={"outlined"}
                                                         type={"number"}
-                                                        error={this.state.user.shopData?.phone > 99999999 || this.state.user.shopData?.phone < 10000000}
+                                                        error={this.state.shop.phone > 99999999 || this.state.shop.phone < 10000000}
                                                         placeholder={"Phone Number"}
-                                                        value={this.state.user.shopData?.phone}
+                                                        value={this.state.shop.phone}
                                                         onChange={(e) => this.setState({
-                                                            user: {
-                                                                ...this.state.user, shopData: {
-                                                                    ...this.state.user.shopData,
-                                                                    phone: e.target.value,
-                                                                },
+                                                            shop: {
+                                                                ...this.state.shop,
+                                                                phone: e.target.value,
                                                             }
                                                         })}
                                                         disabled={this.state.loading}
                                                         InputProps={{
                                                             startAdornment: <InputAdornment position="start">+852 </InputAdornment>,
                                                         }}
-                                                    >
-                                                        Description
-                                                    </TextField> :
-                                                    this.state.user.shopData?.phone}
+                                                    /> :
+                                                    this.state.shop.phone}
                                             </Stack>
                                         </Stack>
 
@@ -331,10 +325,10 @@ export default class Shop extends Component {
 
                                             <Stack direction={"row"} alignItems={"center"}>
 
-                                                <Rating name="read-only" value={this.state.user.shopData?.rating}
+                                                <Rating name="read-only" value={this.state.shop.rating}
                                                         readOnly/>
                                                 <Typography color={"darkgrey"}>
-                                                    ({this.state.user.shopData?.rating.length})
+                                                    ({this.state.shop.rating?.length})
                                                 </Typography>
                                             </Stack>
                                         </Stack>
@@ -342,13 +336,12 @@ export default class Shop extends Component {
                                 </Stack>
                                 {this.state.editing ? <OutlinedInput
                                         multiline fullWidth
-                                        value={this.state.user.shopData?.shopDesc}
+                                        placeholder={"Description"}
+                                        value={this.state.shop.shopDesc}
                                         onChange={(e) => this.setState({
-                                            user: {
-                                                ...this.state.user, shopData: {
-                                                    ...this.state.user.shopData,
-                                                    shopDesc: e.target.value,
-                                                },
+                                            shop: {
+                                                ...this.state.shop, 
+                                                shopDesc: e.target.value,
                                             }
                                         })}
                                         disabled={this.state.loading}
@@ -356,7 +349,7 @@ export default class Shop extends Component {
                                         Description
                                     </OutlinedInput> :
                                     <Typography color={"darkgrey"} textAlign={"center"} fontSize={"small"}>
-                                        {this.state.user.shopData?.shopDesc}
+                                        {this.state.shop.shopDesc}
                                     </Typography>}
                             </Stack>
                         </CardContent>
@@ -364,8 +357,8 @@ export default class Shop extends Component {
                             <Stack direction={"row-reverse"} width={"100%"}>
                                 {this.state.editing ? <>
                                     <LoadingButton color={"success"} variant={"contained"} disabled={
-                                        !this.state.user.shopData?.shopName ||
-                                        this.state.user.shopData?.phone > 99999999 || this.state.user.shopData?.phone < 10000000
+                                        !this.state.shop.shopName ||
+                                        this.state.shop.phone > 99999999 || this.state.shop.phone < 10000000
                                     } loading={this.state.loading} onClick={async () => await this.save()}>
                                         Save
                                     </LoadingButton>
