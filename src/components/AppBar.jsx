@@ -151,6 +151,30 @@ class AppBar extends Component {
                     gettingLocation: false,
                     position: positions
                 })
+            }, (error) => {
+                switch(error.code) {
+                    case error.PERMISSION_DENIED:
+                        console.log("User denied the request for Geolocation.")
+                        break;
+                    case error.POSITION_UNAVAILABLE:
+                        console.log("Location information is unavailable.")
+                        break;
+                    case error.TIMEOUT:
+                        console.log("The request to get user location timed out.")
+                        break;
+                    case error.UNKNOWN_ERROR:
+                        console.log("An unknown error occurred.")
+                        break;
+                }
+            
+                this.setState({
+                    gettingLocation: false,
+                })
+            }, 
+            {
+               enableHighAccuracy: true,
+               timeout: 5000,
+               maximumAge: 0
             });
         } else {
             positions = [-1, -1]
