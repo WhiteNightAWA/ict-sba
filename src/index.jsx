@@ -7,9 +7,10 @@ import {
 } from "react-router-dom";
 import Home from "./pages/Home"
 import Buy from "./pages/Buy";
+import Shop from "./pages/Shop";
 import Login from "./pages/Login";
 import PP from "./pages/PP";
-import Shop from "./pages/Shop";
+import MyShop from "./pages/MyShop";
 import NotFound from "./pages/NotFound";
 
 
@@ -31,9 +32,9 @@ root.render(
                         <Route path="/" element={<App />}>
                             <Route path={""} element={<Home />} />
                             <Route path={"buy"} element={<Buy />} />
+                            <Route path={"buy/shop/:shopID"} element={<Shop />} />
                             <Route path={"login"} element={<Login />} />
-                            <Route path={"shop"} element={<Shop />} />
-
+                            <Route path={"myShop"} element={<MyShop />} />
 
                             <Route path={"*"} element={<NotFound />} />
                             <Route path={"pp"} element={<PP />} />

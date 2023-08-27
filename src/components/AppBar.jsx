@@ -34,14 +34,13 @@ import {
 } from "@mui/material";
 import {
     Chat, Home, LocalMall, Logout, Search,
-    ShoppingCart, Settings, Person, ShoppingBasket, Storefront, Check
+    ShoppingCart, Settings, Person, ShoppingBasket, Storefront, Check, LocationOn
 } from "@mui/icons-material";
 import TabsLink from "./TabsLink";
 import {Link} from "react-router-dom";
 import Requires from "../util/requires";
 import cookie from "react-cookies";
 import {LoadingButton} from '@mui/lab';
-
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js';
 import Axios from "axios";
 
@@ -104,6 +103,7 @@ class AppBar extends Component {
             HKID: "",
             phone: "",
             vat: "",
+            address: "",
             doneing: false,
 
             // sb
@@ -122,7 +122,7 @@ class AppBar extends Component {
                     tabs: [
                         ["主頁", <Home/>, "home"],
                         ["BUY", <LocalMall/>, "buy"],
-                        ["My Shop", <Storefront/>, "shop"],
+                        ["My Shop", <Storefront/>, "myShop"],
                     ],
                     tab: window.location.hash.split("/").pop()
                 })
@@ -144,14 +144,16 @@ class AppBar extends Component {
             this.setState({
                 gettingLocation: true
             });
-            navigator.geolocation.getCurrentPosition(position => {
-                positions = [position.coords.longitude, position.coords.latitude]
-                console.log(positions)
-                this.setState({
-                    gettingLocation: false,
-                    position: positions
-                })
-            }, (error) => {
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                    positions = [position.coords.latitude, position.coords.longitude]
+
+                    console.log(positions)
+                    this.setState({
+                        gettingLocation: false,
+                        position: positions,
+                        address: this.state.address ? this.state.address : positions.toString(),
+                    });
+                }, (error) => {
                 switch(error.code) {
                     case error.PERMISSION_DENIED:
                         console.log("User denied the request for Geolocation.")
@@ -362,15 +364,15 @@ class AppBar extends Component {
                                                 startAdornment: <InputAdornment position="start">+852 </InputAdornment>,
                                             }}
                                         />
-                                        {this.state.position.includes(-1) ?
-                                            <LoadingButton loading={this.state.gettingLocation} 
+                                        { this.state.position.includes(-1) ?
+                                            <LoadingButton loading={this.state.gettingLocation}
                                                             sx={{
                                                                 width: "16em"
                                                             }}
                                                            onClick={async () => await this.getLocation()}>
                                                 Get my location
                                             </LoadingButton> :
-                                            <Typography 
+                                            <Typography
                                             sx={{
                                                 width: "14em"
                                             }}
@@ -380,6 +382,27 @@ class AppBar extends Component {
                                                 {this.state.position.toString()}
                                             </Typography>}
                                         </Stack>
+                                        <TextField
+                                            variant={"outlined"}
+                                            value={this.state.address}
+                                            onChange={(e) => this.setState({ address: e.target.value })}
+                                            multiline
+                                            fullWidth
+
+                                            InputProps={{
+                                                endAdornment: <InputAdornment position="end">
+                                                    <IconButton onClick={() => {
+                                                        window.open("https://www.google.com/maps/search/" + this.state.address)
+                                                    }}>
+                                                        <LocationOn/>
+                                                    </IconButton>
+                                                </InputAdornment>
+                                            }}
+                                            label={"Shop Address"}
+                                        >Shop Address</TextField>
+                                        <Typography color={"error"} variant={"h5"}>
+                                            請確保您在您的商店位置完成此操作
+                                        </Typography>
                                     </Stack>
                                 </Paper>
                             </Collapse>
@@ -393,7 +416,8 @@ class AppBar extends Component {
                                 String(this.checkHKID(this.state.HKID)) === this.state.vat.toString() &&
                                 this.state.shopName &&
                                 !this.state.position.includes(-1) &&
-                                this.state.phone
+                                this.state.phone &&
+                                this.state.address
                             )
                         } variant={"contained"} onClick={async () => await this.done()}>
                             Done

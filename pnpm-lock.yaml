@@ -86,12 +86,18 @@ dependencies:
   react-type-animation:
     specifier: ^3.0.1
     version: 3.0.1(prop-types@15.8.1)(react-dom@18.2.0)(react@18.2.0)
+  react-uploader:
+    specifier: ^3.41.0
+    version: 3.41.0(react@18.2.0)
   react-verification-input:
     specifier: ^3.3.0
     version: 3.3.0(react-dom@18.2.0)(react@18.2.0)
   styled-components:
     specifier: ^5.3.10
     version: 5.3.10(@babel/core@7.22.10)(react-dom@18.2.0)(react-is@18.2.0)(react@18.2.0)
+  uploader:
+    specifier: ^3.48.0
+    version: 3.48.0
   web-vitals:
     specifier: ^2.1.4
     version: 2.1.4
@@ -3344,6 +3350,10 @@ packages:
       eslint-visitor-keys: 3.4.2
     dev: false
 
+  /@upload-io/upload-api-client-upload-js@2.18.0:
+    resolution: {integrity: sha512-yPwsRCecXSilYn4q5ZDD4fyI2PVyUcLimv2LQcfpV3hRyzc8t82NuWHYEYpRZa5K68zxw2RljDf30geT1vJN9g==}
+    dev: false
+
   /@webassemblyjs/ast@1.11.6:
     resolution: {integrity: sha512-IN1xI7PwOvLPgjcf180gC1bqn3q/QaOCwYUahIOhbYUu8KA/3tw2RT/T0Gidi1l7Hhj5D/INhJxiICObqpMu4Q==}
     dependencies:
@@ -4242,6 +4252,10 @@ packages:
 
   /cjs-module-lexer@1.2.3:
     resolution: {integrity: sha512-0TNiGstbQmCFwt4akjjBg5pLRTSyj/PkWQ1ZoO2zntmg9yLqSRxwEa4iCfQLGjqhiqBfOJa7W/E8wfGrTDmlZQ==}
+    dev: false
+
+  /classnames@2.3.2:
+    resolution: {integrity: sha512-CSbhY4cFEJRe6/GQzIk5qXZ4Jeg5pcsP7b5peFSDpffpe1cqjASH/n9UTjBwOp6XpMSTwQ8Za2K5V02ueA7Tmw==}
     dev: false
 
   /clean-css@5.3.2:
@@ -7564,6 +7578,10 @@ packages:
     resolution: {integrity: sha512-FT1yDzDYEoYWhnSGnpE/4Kj1fLZkDFyqRb7fNt6FdYOSxlUWAtp42Eh6Wb0rGIv/m9Bgo7x4GhQbm5Ys4SG5ow==}
     dev: false
 
+  /lodash.isequal@4.5.0:
+    resolution: {integrity: sha512-pDo3lu8Jhfjqls6GkMgpahsF9kCyayhgykjyLMNFTKWrpVdAQtYyB4muAMWozBB4ig/dtWAmsMxLEI8wuz+DYQ==}
+    dev: false
+
   /lodash.memoize@4.1.2:
     resolution: {integrity: sha512-t7j+NzmgnQzTAYXcsHYLgimltOV1MXHtlOWf6GjL9Kj8GK5FInw5JotxvbOs+IvV1/Dzo04/fCGfLVs7aXb4Ag==}
     dev: false
@@ -8981,6 +8999,10 @@ packages:
     resolution: {integrity: sha512-Q+/tYsFU9r7xoOJ+y/ZTtdVQwTWfzjbiXBDMM/JKUux3+QPP02iUuIoeBQ+Ot6oEDlC+/PGjB/5A3K7KKb7hcw==}
     dev: false
 
+  /preact@10.17.1:
+    resolution: {integrity: sha512-X9BODrvQ4Ekwv9GURm9AKAGaomqXmip7NQTZgY7gcNmr7XE83adOMJvd3N42id1tMFU7ojiynRsYnY6/BRFxLA==}
+    dev: false
+
   /prelude-ls@1.2.1:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
@@ -9028,6 +9050,10 @@ packages:
 
   /process-nextick-args@2.0.1:
     resolution: {integrity: sha512-3ouUOpQhtgrbOa17J7+uxOTpITYWaGP7/AhoR3+A+/1e9skrzelGi/dXzEYyvbxubEF6Wn2ypscTKiKJFFn1ag==}
+    dev: false
+
+  /progress-smoother@1.7.0:
+    resolution: {integrity: sha512-ZIbSbPQ8SnEf5Sa0If9lfvn5URyrZfgTTh5DM+04j1GafiLIaWDWW+1AkYXzGl7JQvzAvCy5E1ZPOgx8XORyew==}
     dev: false
 
   /promise@8.3.0:
@@ -9450,6 +9476,16 @@ packages:
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0(react@18.2.0)
+    dev: false
+
+  /react-uploader@3.41.0(react@18.2.0):
+    resolution: {integrity: sha512-v8feURMOIrkKK4ekKGcC5on9SVV1JpE6DFDveqrACB5hLN5ViCYPX8k0DJmi285kxzWru5+js3LXtlzMXJUZ1g==}
+    peerDependencies:
+      react: '>=16.3.0'
+    dependencies:
+      lodash.isequal: 4.5.0
+      react: 18.2.0
+      uploader: 3.48.0
     dev: false
 
   /react-verification-input@3.3.0(react-dom@18.2.0)(react@18.2.0):
@@ -10758,6 +10794,21 @@ packages:
       browserslist: 4.21.10
       escalade: 3.1.1
       picocolors: 1.0.0
+
+  /upload-js@2.23.0:
+    resolution: {integrity: sha512-qxiJYYYtHc1DqrWcfb8iv4kejZFv+0FGYVo9Kqb/hQ+2ljs24VOU6qd5g6XDfLAe7bOe+EpOoNPdBaWQUt7Kzw==}
+    dependencies:
+      '@upload-io/upload-api-client-upload-js': 2.18.0
+      progress-smoother: 1.7.0
+    dev: false
+
+  /uploader@3.48.0:
+    resolution: {integrity: sha512-WeIUUf0dO3sfyYrukqvJdO38ZW4ZPurzcLvi24sEUYG2t4wWbum3EL1+lCEu6cATAIQjez3NLPv5dkiLA7GZrw==}
+    dependencies:
+      classnames: 2.3.2
+      preact: 10.17.1
+      upload-js: 2.23.0
+    dev: false
 
   /uri-js@4.4.1:
     resolution: {integrity: sha512-7rKUyy33Q1yc98pQ1DAmLtwX109F7TIfWlW1Ydo8Wl1ii1SeHieeh0HHfPeL2fMXK6z0s8ecKs9frCuLJvndBg==}
