@@ -14,14 +14,16 @@ import MyShop from "./pages/MyShop";
 import NotFound from "./pages/NotFound";
 
 
-import { AuthProvider } from 'react-auth-kit'
+import {AuthProvider} from 'react-auth-kit'
 import {GoogleOAuthProvider} from "@react-oauth/google";
+import {DevSupport} from "@react-buddy/ide-toolbox";
+import {ComponentPreviews, useInitial} from "./dev";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
     <React.StrictMode>
-        <AuthProvider authType = {'cookie'}
+        <AuthProvider authType={'cookie'}
                       authName={'_auth'}
                       cookieDomain={window.location.hostname}
                       cookieSecure={window.location.protocol === "https:"}>
@@ -29,15 +31,19 @@ root.render(
             <GoogleOAuthProvider clientId={"492651620125-qq34m1ql3bgdgfdncb56irfa4c43pfhp.apps.googleusercontent.com"}>
                 <HashRouter>
                     <Routes>
-                        <Route path="/" element={<App />}>
-                            <Route path={""} element={<Home />} />
-                            <Route path={"buy"} element={<Buy />} />
-                            <Route path={"buy/shop/:shopID"} element={<Shop />} />
-                            <Route path={"login"} element={<Login />} />
-                            <Route path={"myShop"} element={<MyShop />} />
+                        <Route path="/" element={<DevSupport ComponentPreviews={ComponentPreviews}
+                                                             useInitialHook={useInitial}
+                        >
+                            <App/>
+                        </DevSupport>}>
+                            <Route path={""} element={<Home/>}/>
+                            <Route path={"buy"} element={<Buy/>}/>
+                            <Route path={"buy/shop/:shopID"} element={<Shop/>}/>
+                            <Route path={"login"} element={<Login/>}/>
+                            <Route path={"myShop"} element={<MyShop/>}/>
 
-                            <Route path={"*"} element={<NotFound />} />
-                            <Route path={"pp"} element={<PP />} />
+                            <Route path={"*"} element={<NotFound/>}/>
+                            <Route path={"pp"} element={<PP/>}/>
                         </Route>
                     </Routes>
                 </HashRouter>
