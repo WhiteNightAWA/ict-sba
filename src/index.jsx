@@ -18,6 +18,7 @@ import {AuthProvider} from 'react-auth-kit'
 import {GoogleOAuthProvider} from "@react-oauth/google";
 import {DevSupport} from "@react-buddy/ide-toolbox";
 import {ComponentPreviews, useInitial} from "./dev";
+import Item from "./pages/Item";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -38,7 +39,7 @@ root.render(
                         </DevSupport>}>
                             <Route path={""} element={<Home/>}/>
                             <Route path={"buy"} element={<Buy/>}/>
-                            <Route path={"buy/shop/:shopID"} element={<Shop/>}/>
+                            <Route path={"shop/:shopId"} element={<Shop/>}/>
                             <Route path={"login"} element={<Login/>}/>
                             <Route path={"myShop"} element={<MyShop/>}/>
 

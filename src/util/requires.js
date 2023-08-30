@@ -24,6 +24,23 @@ export default class Requires {
         return res;
     };
 
+    static async delete(path: String) {
+        let res;
+        try {
+            if (cookie.load("jwt")) {
+                res = await Axios.delete(url+path, {
+                    headers: { Authorization: `Bearer ${cookie.load("jwt")}` }
+                });
+            } else {
+                res = await Axios.delete(url+path);
+            }
+        } catch (err) {
+            res = err.response;
+        }
+        console.log(res);
+        return res;
+    };
+
     static async post(path: String, data: Object) {
         let res;
         try {
@@ -42,9 +59,25 @@ export default class Requires {
                 cookie.save(...res.data.cookies);
             }
         }
-
         return res;
     };
+
+
+    static async put(path: String, data: Object) {
+        let res;
+        try {
+            if (cookie.load("jwt")) {
+                res = await Axios.put(url+path, data, {
+                    headers: { authorization: `Bearer ${cookie.load("jwt")}` },
+                });
+            } else {
+                res = await Axios.put(url+path, data);
+            }
+        } catch (err) {
+            res = err.response;
+        }
+        return res;
+    }
 }
 
 

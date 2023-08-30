@@ -1,4 +1,4 @@
-import {Component, useContext} from "react";
+import {Component} from "react";
 import {
     IconButton,
     Avatar,
@@ -33,7 +33,7 @@ import {
     Snackbar
 } from "@mui/material";
 import {
-    Chat, Home, LocalMall, Logout, Search,
+    Home, LocalMall, Logout, Search,
     ShoppingCart, Settings, Person, ShoppingBasket, Storefront, Check, LocationOn
 } from "@mui/icons-material";
 import TabsLink from "./TabsLink";
@@ -42,7 +42,6 @@ import Requires from "../util/requires";
 import cookie from "react-cookies";
 import {LoadingButton} from '@mui/lab';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js';
-import Axios from "axios";
 
 
 const SearchBar = styled('div')(({theme}) => ({
@@ -185,17 +184,17 @@ class AppBar extends Component {
     checkHKID(idno) { // Check vat code
         var alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         let i, a, d, sum = 0, s = "";
-        if (idno.length != 7) return;
+        if (idno.length !== 7) return;
 
         function valid(idno) {	// A123456
             var a = idno.charAt(0).toUpperCase();
-            if (idno.length != 7 || a < "A" || a > "Z") return 0;
+            if (idno.length !== 7 || a < "A" || a > "Z") return 0;
             for (i = 1; i < idno.length; i++)
                 if (idno.charAt(i) < "0" || idno.charAt(i) > "9") return 0;
             return 1;
         }
 
-        if (valid(idno) == 1) {
+        if (valid(idno) === 1) {
             a = idno.charAt(0).toUpperCase();
             sum = 58 * 9 + (alpha.indexOf(a) + 10) * 8;
             s = "58*9 +" + (alpha.indexOf(a) + 10) + "*8"
@@ -205,8 +204,8 @@ class AppBar extends Component {
             }
 
             d = sum % 11;
-            if (d == 0) d = "0";
-            else if (d == 1) d = "A";
+            if (d === 0) d = "0";
+            else if (d === 1) d = "A";
             else d = 11 - d;
             return d;
         }
