@@ -838,7 +838,7 @@ export class ItemDisplay extends Component {
                                     return (<Card sx={{
                                         width: "auto",
                                         m: 2,
-                                        minWidth: 300,
+                                        minWidth: "50%",
                                         height: "fit-content",
                                         background: item.visible === false ? "repeating-linear-gradient(-45deg, rgba(255, 255, 255, .125), rgba(255, 255, 255, .125) 30px, rgba(255, 0, 0, 0) 0, rgba(255, 255, 255, 0) 50px) !important" : ""
                                     }} elevation={6}

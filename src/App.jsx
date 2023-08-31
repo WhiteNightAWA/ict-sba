@@ -15,11 +15,11 @@ class App extends react.Component {
         super(props);
 
         let darkMode = window.localStorage.getItem("darkMode");
+        window.localStorage.setItem("darkMode", "dark")
         if (darkMode === null) {
             const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             darkMode = prefersDarkMode ? "dark" : "light";
-            darkMode = "darkMode";
-            window.localStorage.setItem("darkMode", darkMode);
+            window.localStorage.setItem("darkMode", "dark");
         }
 
         this.state = {
