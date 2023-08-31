@@ -9,7 +9,7 @@ import {
     DialogContent,
     DialogTitle, Divider, ImageList, ImageListItem, List, ListItem, Menu, MenuItem, Snackbar,
     Stack, TextField,
-    Typography, Rating, Checkbox, Tooltip, FormControlLabel,
+    Typography, Rating, Checkbox, Tooltip, FormControlLabel, CardContent,
 } from "@mui/material";
 import {AutoPlaySwipeableViews, getValueColor, uploader} from "../util/functions";
 import Pagination from "../components/Pagination";
@@ -17,17 +17,17 @@ import {
     ArrowRight, Check, Delete, Edit,
     ExpandMore,
     Favorite,
-    Share, Star, Visibility, VisibilityOff, Warning, Add, Help
+    Share, Star, Visibility, VisibilityOff, Warning, Add, Help, ArrowLeft, ChevronLeft, ChevronRight
 } from "@mui/icons-material";
 import {UploadDropzone, UploadButton} from "react-uploader";
 import Requires from "../util/requires";
 import {AddItemDl} from "../components/AddItemDl";
+import SwipeableViews from "react-swipeable-views";
 
 export default class Item extends Component {
     constructor(props) {
         super(props);
 
-        console.log(props);
         this.state = {
             item: props.item,
             shop: {},
@@ -53,6 +53,9 @@ export default class Item extends Component {
             addingPag: 0,
 
             setRating: [],
+            ratedUser: [],
+            ratedUserPags: [0, 0, 0],
+            ratedUserPag: 0,
         }
 
         this.colors = ["goldenrod", "gold", "darkorange", "#ff5b00", "red"]
@@ -69,6 +72,22 @@ export default class Item extends Component {
         }
     }
 
+    loadRated = async () => {
+        let ratedUser = []
+        Array.from(this.state.setRating).splice(0, 3).map(async (item, index) => {
+            let user = await Requires.get("/user/" + item.user_id);
+            console.log(user);
+            if (user.status === 200) {
+                ratedUser.push({
+                    ...item,
+                    username: item.anonymous ? "匿名" : user.data.user.username,
+                    photoURL: item.anonymous ? "" : user.data.user.photoURL
+                })
+            }
+        })
+        this.setState({ratedUser: ratedUser})
+    }
+
     async componentDidMount() {
         let res = await Requires.get("/shops/get/" + this.state.item.shopId)
         if (res.status === 200) {
@@ -77,6 +96,7 @@ export default class Item extends Component {
                 setRating: this.state.item.rating ? this.state.item.rating : []
             });
         }
+        await this.loadRated()
     }
 
     render() {
@@ -509,7 +529,7 @@ export default class Item extends Component {
                                     <Rating
                                         readOnly
                                         value={[0, undefined].includes(this.state.setRating?.length) ? 0 : this.state.setRating.map(r => r.rate).reduce((a, c) => a + c) / this.state.setRating.length}
-                                        precision={1}
+                                        precision={0.5}
                                         icon={<Star/>}
                                         emptyIcon={<Star style={{opacity: 0.55}}/>}
                                         sx={{"*": {fontSize: "xxx-large"}}}
@@ -529,8 +549,8 @@ export default class Item extends Component {
                                     height={"5em"}
                                 >
                                     暫無評價
-                                </Stack> : <Stack direction={"row"}>
-                                    <Stack width={"45%"} alignItems={"center"}>
+                                </Stack> : <Stack>
+                                    <Stack width={"100%"} alignItems={"center"}>
                                         <Stack direction={"row"} alignItems={"center"}>
                                             <Typography variant={"h1"}>
                                                 {this.state.setRating.length === 0 ? "0.0" : (Math.round(this.state.setRating.map(r => r.rate).reduce((a, c) => a + c) / this.state.setRating.length * 10) / 10).toFixed(1)}
@@ -584,15 +604,118 @@ export default class Item extends Component {
                                                 control={<Checkbox
                                                     sx={{pt: 1}}
                                                     value={this.state.ratingFilter}
-                                                    onChange={(e, n) => {
+                                                    onChange={async (e, n) => {
                                                         this.setState({
                                                             ratingFilter: n,
                                                             setRating: n ? this.state.item.rating.filter(r => r.imageList.length !== 0) : this.state.item.rating
                                                         });
+                                                        setTimeout(async () => await this.loadRated(), 100);
                                                     }}
                                                 />}
                                             />
                                         </Stack>
+                                    </Stack>
+                                    <Divider/>
+                                    <Stack width={"100%"} display={"related"} position={"relative"}>
+                                        <Button sx={{
+                                            height: "5em",
+                                            position: "absolute",
+                                            top: "calc(50% - 2.5em)",
+                                            left: "0",
+                                            zIndex: "999"
+                                        }}
+                                                onClick={(e) => this.setState({ratedUserPag: this.state.ratedUserPag === 0 ? this.state.ratedUser.length - 1 : this.state.ratedUserPag - 1})}>
+                                            <ChevronLeft fontSize={"4em"}/>
+                                        </Button>
+                                        <Button sx={{
+                                            height: "5em",
+                                            position: "absolute",
+                                            top: "calc(50% - 2.5em)",
+                                            right: "0",
+                                            zIndex: "999"
+                                        }}
+                                                onClick={(e) => this.setState({ratedUserPag: this.state.ratedUserPag === this.state.ratedUser.length - 1 ? 0 : this.state.ratedUserPag + 1})}>
+                                            <ChevronRight fontSize={"4em"}/>
+                                        </Button>
+                                        <SwipeableViews
+                                            index={this.state.ratedUserPag}
+                                            onChangeIndex={(i) => this.setState({ratedUserPag: i})}
+                                            style={{width: "100%"}}
+                                        >
+                                            {this.state.ratedUser.map((item, index) => {
+                                                return <Stack justifyContent={"center"} alignItems={"center"}
+                                                              height={"100%"} width={"100%"}>
+                                                    <Card elevation={12} sx={{m: "2em", width: "80%"}}>
+                                                        <CardHeader
+                                                            avatar={
+                                                                <Avatar
+                                                                    src={item.photoURL}
+                                                                    alt={item.username}
+                                                                    sx={{
+                                                                        height: 40,
+                                                                        width: 40
+                                                                    }}
+                                                                />
+                                                            }
+                                                            title={<Typography
+                                                                variant={"h5"}>{item.username}</Typography>}
+                                                        />
+                                                        {
+                                                            item.imageList?.length !== 0 && <Box sx={{
+                                                                position: 'relative',
+                                                                filter: "drop-shadow(2px 4px 6px black)"
+                                                            }}>
+                                                                <AutoPlaySwipeableViews
+                                                                    index={this.state.ratedUserPags[index]}
+                                                                    onChangeIndex={(i) => {
+                                                                        let n = this.state.ratedUserPags;
+                                                                        n[index] = i;
+                                                                        this.setState({ratedUserPags: n})
+                                                                    }}
+                                                                >
+                                                                    {
+                                                                        item.imageList?.map((url, i) => {
+                                                                            return (
+                                                                                <CardMedia
+                                                                                    key={i}
+                                                                                    sx={{height: 200}}
+                                                                                    image={url}
+                                                                                    title={url}
+                                                                                />)
+                                                                        })
+                                                                    }
+                                                                </AutoPlaySwipeableViews>
+                                                                <Pagination
+                                                                    dots={item.imageList?.length}
+                                                                    index={this.state.ratedUserPags[index]}
+                                                                    onChangeIndex={(i) => {
+                                                                        let n = this.state.ratedUserPags;
+                                                                        n[index] = i;
+                                                                        this.setState({ratedUserPags: n})
+                                                                    }}
+                                                                />
+                                                            </Box>
+                                                        }
+                                                        <CardContent>
+                                                            <Rating
+                                                                readOnly
+                                                                value={item.rate}
+                                                                precision={1}
+                                                                icon={<Star/>}
+                                                                emptyIcon={<Star style={{opacity: 0.55}}/>}
+                                                            />
+                                                            <Typography color={"gray"}>
+                                                                {item.desc}
+                                                            </Typography>
+                                                        </CardContent>
+                                                    </Card></Stack>
+                                            })}
+                                        </SwipeableViews>
+                                        <Pagination
+                                            dots={this.state.ratedUser.length}
+                                            index={this.state.ratedUserPag}
+                                            onChangeIndex={(i) => this.setState({ratedUserPag: i})}
+                                        />
                                     </Stack>
                                 </Stack>}
                                 <Divider sx={{my: 2}}/>
@@ -647,13 +770,14 @@ export default class Item extends Component {
                                             minRows={3}
                                         />
                                         <Stack direction={"row"} alignItems={"center"}>
-                                            <Checkbox
-                                                value={this.state.addingRateAnonymous}
-                                                onChange={(e, c) => this.setState({addingRateAnonymous: c})}
+                                            <FormControlLabel
+                                                control={<Checkbox
+                                                    value={this.state.addingRateAnonymous}
+                                                    defaultChecked={this.state.addingRateAnonymous}
+                                                    onChange={(e, c) => this.setState({addingRateAnonymous: c})}
+                                                />}
+                                                label={"匿名"}
                                             />
-                                            <Typography>
-                                                匿名
-                                            </Typography>
                                         </Stack>
                                     </Stack>
                                 </Stack>}
@@ -667,7 +791,8 @@ export default class Item extends Component {
                                         <Button
                                             variant={"contained"}
                                             color={"success"}
-                                            startIcon={this.state.item.rating.filter(r => r.user_id === this.props.user?.user_id).length !== 0 ? <Edit /> : <Add/>}
+                                            startIcon={this.state.item.rating.filter(r => r.user_id === this.props.user?.user_id).length !== 0 ?
+                                                <Edit/> : <Add/>}
                                             onClick={async (e) => {
                                                 let res = await Requires.put("/users/marked/" + this.state.item._id, {
                                                     action: "rate",
@@ -684,7 +809,9 @@ export default class Item extends Component {
                                                         },
                                                         addingRate: false,
                                                         setRating: res.data.rating,
-                                                    })
+                                                    });
+                                                    setTimeout(async () => await this.loadRated(), 100)
+
                                                 }
                                             }}
                                             disabled={
@@ -698,13 +825,13 @@ export default class Item extends Component {
                                                 startIcon={<Edit/>}
                                                 onClick={() => {
                                                     let ratings = this.state.item.rating.filter(r => r.user_id === this.props.user?.user_id)[0];
-                                                    console.log(ratings);
+                                                    console.log(ratings.anonymous);
                                                     this.setState(this.props.user?._id ? {
                                                         addingRate: true,
                                                         addingRateImgs: ratings.imageList,
                                                         addingRating: ratings.rate,
                                                         addingRateDesc: ratings.desc,
-                                                        addingRateAnonymous: ratings.anonymous ? ratings.anonymous : false,
+                                                        addingRateAnonymous: ratings.anonymous ? true : false,
                                                     } : {needLoginSb: true});
                                                 }}
                                             >修改評價</Button> : <Button
