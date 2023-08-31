@@ -184,7 +184,7 @@ export default class Item extends Component {
                                     color={"info"}
                                     onClick={() => {
                                         this.setState({copied: true})
-                                        navigator.clipboard.writeText(window.location.host + `/#/shop/${this.props.shopId}?itemId=${this.state.item._id}`);
+                                        navigator.clipboard.writeText(window.location.host + (process.env.REACT_APP_HERF !== undefined ? process.env.REACT_APP_HERF : "") + `/#/shop/${this.props.shopId}?itemId=${this.state.item._id}`);
                                         setTimeout(() => this.setState({copied: false}), 1000);
                                     }}
                                 >

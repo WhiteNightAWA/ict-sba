@@ -48,7 +48,6 @@ import {
     LocationOn,
     MoreVert,
     OpenInNew, Replay,
-    Share
 } from "@mui/icons-material";
 import {LoadingButton, Rating, TabContext, TabPanel} from "@mui/lab";
 import {autoPlay} from "react-swipeable-views-utils";

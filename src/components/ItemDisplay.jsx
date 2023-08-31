@@ -173,6 +173,20 @@ export class ItemDisplay extends Component {
                 pag: Array(res.data.items.length).fill(0),
                 noItem: res.data.items.length < 1
             });
+
+            if (window.location.href.includes("?")) {
+                let obj = Object.fromEntries(new URLSearchParams(window.location.href.split("?")[1]));
+
+                if (obj.itemId) {
+                    if (this.state.items.map(i => i._id.toString() === obj.itemId).includes(true)) {
+                        this.setState({
+                            selectedItem: this.state.items.filter(i => i._id.toString() === obj.itemId)[0]
+                        });
+                        delete obj.itemId;
+                        window.location.hash = window.location.hash.split("?")[0] + new URLSearchParams(obj).toString();
+                    }
+                }
+            }
         } else {
             this.setState({
                 loading: false,
@@ -194,23 +208,7 @@ export class ItemDisplay extends Component {
                 user: user.data,
             })
         }
-        setTimeout(async () => {
-            await this.loadItem();
-
-            if (window.location.href.includes("?")) {
-                let obj = Object.fromEntries(new URLSearchParams(window.location.href.split("?")[1]));
-
-                if (obj.itemId) {
-                    if (this.state.items.map(i => i._id.toString() === obj.itemId).includes(true)) {
-                        this.setState({
-                            selectedItem: this.state.items.filter(i => i._id.toString() === obj.itemId)[0]
-                        });
-                        delete obj.itemId;
-                        window.location.hash = window.location.hash.split("?")[0] + new URLSearchParams(obj).toString();
-                    }
-                }
-            }
-        }, 100);
+        await this.loadItem();
     }
 
     render() {
@@ -884,7 +882,7 @@ export class ItemDisplay extends Component {
                                                     </IconButton> : <IconButton
                                                         onClick={() => {
                                                             this.setState({copied: item._id})
-                                                            navigator.clipboard.writeText(window.location.host + `/#/shop/${this.state.shop._id}?itemId=${item._id}`);
+                                                            navigator.clipboard.writeText(window.location.host + (process.env.REACT_APP_HERF !== undefined ? process.env.REACT_APP_HERF : "") + `/#/shop/${this.state.shop._id}?itemId=${item._id}`);
                                                             setTimeout(() => this.setState({copied: null}), 1000);
                                                         }}
                                                     >
@@ -1179,7 +1177,7 @@ export class ItemDisplay extends Component {
                                                     </IconButton> : <IconButton
                                                         onClick={() => {
                                                             this.setState({copied: item._id})
-                                                            navigator.clipboard.writeText(window.location.host + `/#/shop/${this.state.shop._id}?itemId=${item._id}`);
+                                                            navigator.clipboard.writeText(window.location.host + (process.env.REACT_APP_HERF !== undefined ? process.env.REACT_APP_HERF : "") + `/#/shop/${this.state.shop._id}?itemId=${item._id}`);
                                                             setTimeout(() => this.setState({copied: null}), 1000);
                                                         }}
                                                     >
