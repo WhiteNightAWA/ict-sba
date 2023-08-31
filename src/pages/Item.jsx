@@ -9,7 +9,7 @@ import {
     DialogContent,
     DialogTitle, Divider, ImageList, ImageListItem, List, ListItem, Menu, MenuItem, Snackbar,
     Stack, TextField,
-    Typography
+    Typography, Rating, Checkbox, Tooltip, FormControlLabel,
 } from "@mui/material";
 import {AutoPlaySwipeableViews, getValueColor, uploader} from "../util/functions";
 import Pagination from "../components/Pagination";
@@ -17,9 +17,9 @@ import {
     ArrowRight, Check, Delete, Edit,
     ExpandMore,
     Favorite,
-    Share, Visibility, VisibilityOff, Warning
+    Share, Star, Visibility, VisibilityOff, Warning, Add, Help
 } from "@mui/icons-material";
-import {UploadDropzone} from "react-uploader";
+import {UploadDropzone, UploadButton} from "react-uploader";
 import Requires from "../util/requires";
 import {AddItemDl} from "../components/AddItemDl";
 
@@ -44,7 +44,18 @@ export default class Item extends Component {
             deleteCountDown: 5,
 
             pag: 0,
+
+            addingRate: false,
+            addingRateImgs: [],
+            addingRateDesc: "",
+            addingRateAnonymous: false,
+            addingRating: 0,
+            addingPag: 0,
+
+            setRating: [],
         }
+
+        this.colors = ["goldenrod", "gold", "darkorange", "#ff5b00", "red"]
     }
 
     updateItem = async (update) => {
@@ -61,7 +72,10 @@ export default class Item extends Component {
     async componentDidMount() {
         let res = await Requires.get("/shops/get/" + this.state.item.shopId)
         if (res.status === 200) {
-            this.setState({shop: res.data});
+            this.setState({
+                shop: res.data,
+                setRating: this.state.item.rating ? this.state.item.rating : []
+            });
         }
     }
 
@@ -162,7 +176,7 @@ export default class Item extends Component {
                                     <Button
                                         startIcon={<Favorite/>}
                                         variant={"outlined"}
-                                        onClick={async () => this.props.user?._id ? await this.props.onFavorite(false, this.state.item._id) : this.setState({ needLoginSb: true })}
+                                        onClick={async () => this.props.user?._id ? await this.props.onFavorite(false, this.state.item._id) : this.setState({needLoginSb: true})}
                                     >
                                         Favorite
                                     </Button>
@@ -191,7 +205,7 @@ export default class Item extends Component {
                                     Share
                                 </Button>}
                                 <Button startIcon={<Warning/>} variant={"outlined"} color={"warning"}
-                                        onClick={() => this.props.user?._id ? this.setState({reportDl: true}) : this.setState({ needLoginSb: true })}>
+                                        onClick={() => this.props.user?._id ? this.setState({reportDl: true}) : this.setState({needLoginSb: true})}>
                                     Report
                                 </Button>
 
@@ -437,7 +451,7 @@ export default class Item extends Component {
                                 >
                                     <a style={{
                                         fontSize: "2.5rem"
-                                    }}>最低價格：${Math.min(...this.state.item.price.map(i => i[0] / i[1]))}</a><sub>/{this.state.item.unit}
+                                    }}>最低價格：${Math.ceil(Math.min(...this.state.item.price.map(i => i[0] / i[1])) * 10) / 10}</a><sub>/{this.state.item.unit}
                                     <a style={{color: "gray", marginLeft: "3em"}}>(點擊查看所有價格)</a></sub>
                                 </Typography>
                             </AccordionSummary>
@@ -452,7 +466,7 @@ export default class Item extends Component {
                                         }}>
                                             HKD${p[0]} <ArrowRight/> {p[1]}{this.state.item.unit}
                                             <Typography variant={"h6"} color={"lightgray"} sx={{ml: 3}}>
-                                                ${p[0] / p[1]}@{this.state.item.unit}
+                                                ${Math.ceil(p[0] / p[1] * 100) / 100}@{this.state.item.unit}
                                             </Typography>
                                         </MenuItem>
                                     })}
@@ -487,6 +501,222 @@ export default class Item extends Component {
                                     </Stack>
                                 </AccordionSummary>
                             </Accordion>}
+                        <Accordion defaultExpanded>
+                            <AccordionSummary expandIcon={<ExpandMore/>}>
+                                <Stack direction={"row"} alignItems={"center"}>
+                                    <Typography
+                                        style={{fontSize: "2.5rem", color: "lightyellow"}}>商品評價：</Typography>
+                                    <Rating
+                                        readOnly
+                                        value={[0, undefined].includes(this.state.setRating?.length) ? 0 : this.state.setRating.map(r => r.rate).reduce((a, c) => a + c) / this.state.setRating.length}
+                                        precision={1}
+                                        icon={<Star/>}
+                                        emptyIcon={<Star style={{opacity: 0.55}}/>}
+                                        sx={{"*": {fontSize: "xxx-large"}}}
+                                    />
+                                    <Typography color={"gray"} pl={2}>
+                                        ({[0, undefined].includes(this.state.setRating?.length) ? "暫無評價" : this.state.setRating.length})
+                                    </Typography>
+                                </Stack>
+                            </AccordionSummary>
+                            <Divider/>
+                            <AccordionDetails>
+                                {[0, undefined].includes(this.state.item.rating?.length) ? <Stack
+                                    fontSize={"4em"}
+                                    width={"100%"}
+                                    alignItems={"center"}
+                                    justifyContent={"center"}
+                                    height={"5em"}
+                                >
+                                    暫無評價
+                                </Stack> : <Stack direction={"row"}>
+                                    <Stack width={"45%"} alignItems={"center"}>
+                                        <Stack direction={"row"} alignItems={"center"}>
+                                            <Typography variant={"h1"}>
+                                                {this.state.setRating.length === 0 ? "0.0" : (Math.round(this.state.setRating.map(r => r.rate).reduce((a, c) => a + c) / this.state.setRating.length * 10) / 10).toFixed(1)}
+                                            </Typography>
+                                            <Stack pl={2}>
+                                                {[5, 4, 3, 2, 1].map((i, index) => {
+                                                    return <Stack key={index} alignItems={"center"} direction={"row"}>
+                                                        <Typography>{i}</Typography>
+                                                        <Star fontSize={"small"}/>
+                                                        <Box
+                                                            ml={1}
+                                                            borderRadius={"4px"}
+                                                            boxShadow={"inset #333030 0 0 0.25em 0.125em"}
+                                                            width={"150px"}
+                                                            height={"10px"}
+                                                            bgcolor={"rgba(255,255,255,0.2)"}
+                                                        ><Box
+                                                            height={"10px"}
+                                                            borderRadius={"4px"}
+                                                            bgcolor={this.colors[index]}
+                                                            sx={{
+                                                                transition: "width 0.5s"
+                                                            }}
+                                                            width={this.state.setRating.length === 0 ? 0 : this.state.setRating?.filter(r => r.rate === i).length / this.state.setRating?.filter(r => r.rate === this.state.setRating?.map(r => r.rate).reduce(
+                                                                (acc, val, index, arr) =>
+                                                                    (arr.filter(v => v === val).length > acc[1] ? [val, arr.filter(v => v === val).length] : acc),
+                                                                [null, 0]
+                                                            )[0]).length * 150}
+                                                        /></Box>
+                                                    </Stack>
+                                                })}
+                                            </Stack>
+                                        </Stack>
+                                        <Typography color={"gray"}>
+                                            {this.state.setRating.length}則評價
+                                        </Typography>
+                                        <Stack direction={"row"} alignItems={"center"}>
+                                            <FormControlLabel
+                                                label={<Stack direction={"row"}>
+                                                    <Typography>
+                                                        精選評價
+                                                    </Typography>
+                                                    <Tooltip
+                                                        arrow
+                                                        title={<Typography variant={"h6"}>評價必需附帶照片</Typography>}
+                                                        placement="top"
+                                                    >
+                                                        <Help fontSize={"small"}/>
+                                                    </Tooltip>
+                                                </Stack>}
+                                                control={<Checkbox
+                                                    sx={{pt: 1}}
+                                                    value={this.state.ratingFilter}
+                                                    onChange={(e, n) => {
+                                                        this.setState({
+                                                            ratingFilter: n,
+                                                            setRating: n ? this.state.item.rating.filter(r => r.imageList.length !== 0) : this.state.item.rating
+                                                        });
+                                                    }}
+                                                />}
+                                            />
+                                        </Stack>
+                                    </Stack>
+                                </Stack>}
+                                <Divider sx={{my: 2}}/>
+                                {this.state.addingRate && <Stack direction={"row"} height={"20em"}>
+                                    <Stack width={"40%"}>
+                                        {
+                                            this.state.addingRateImgs?.length !== 0 ? <ImageList
+                                                sx={{width: "100%", height: "100%"}}
+                                                children={this.state.addingRateImgs?.map((item) => (
+                                                    <ImageListItem key={item}>
+                                                        <img
+                                                            src={`${item}?w=164&h=164&fit=crop&auto=format`}
+                                                            srcSet={`${item}?w=164&h=164&fit=crop&auto=format&dpr=2 2x`}
+                                                            alt={item}
+                                                            loading="lazy"
+                                                        />
+                                                    </ImageListItem>
+                                                ))}
+                                            /> : <Stack fontSize={"2em"} width={"100%"} alignItems={"center"}
+                                                        justifyContent={"center"} height={"100%"}>
+                                                No Image
+                                            </Stack>
+                                        }
+                                        <UploadButton
+                                            uploader={uploader}
+                                            options={{
+                                                multi: true,
+                                            }}
+                                            children={(props) => <Button {...props} variant={"contained"}>Upload
+                                                Images</Button>}
+                                            onComplete={files => this.setState({
+                                                addingRateImgs: files.map((f) => f.fileUrl)
+                                            })}
+                                        />
+                                    </Stack>
+                                    <Stack width={"calc(60% - 4em)"} px={"2em"} alignItems={"center"}
+                                           justifyContent={"space-evenly"}>
+                                        <Rating
+                                            value={this.state.addingRating}
+                                            onChange={(e, n) => this.setState({addingRating: n})}
+                                            precision={1}
+                                            icon={<Star/>}
+                                            emptyIcon={<Star style={{opacity: 0.55}}/>}
+                                            sx={{"*": {fontSize: "3rem"}}}
+                                        />
+                                        <TextField
+                                            value={this.state.addingRateDesc}
+                                            onChange={(e) => this.setState({addingRateDesc: e.target.value})}
+                                            label={"Description"}
+                                            fullWidth
+                                            multiline
+                                            minRows={3}
+                                        />
+                                        <Stack direction={"row"} alignItems={"center"}>
+                                            <Checkbox
+                                                value={this.state.addingRateAnonymous}
+                                                onChange={(e, c) => this.setState({addingRateAnonymous: c})}
+                                            />
+                                            <Typography>
+                                                匿名
+                                            </Typography>
+                                        </Stack>
+                                    </Stack>
+                                </Stack>}
+                                <Stack direction={"row"} justifyContent={"center"}>
+                                    {this.state.addingRate ? <>
+                                        <Button
+                                            variant={"text"}
+                                            color={"error"}
+                                            onClick={(e) => this.setState({addingRate: false})}
+                                        >Cancel</Button>
+                                        <Button
+                                            variant={"contained"}
+                                            color={"success"}
+                                            startIcon={this.state.item.rating.filter(r => r.user_id === this.props.user?.user_id).length !== 0 ? <Edit /> : <Add/>}
+                                            onClick={async (e) => {
+                                                let res = await Requires.put("/users/marked/" + this.state.item._id, {
+                                                    action: "rate",
+                                                    imageList: this.state.addingRateImgs,
+                                                    rate: this.state.addingRating,
+                                                    desc: this.state.addingRateDesc,
+                                                    anonymous: this.state.addingRateAnonymous,
+                                                })
+                                                if (res.status === 200) {
+                                                    this.setState({
+                                                        item: {
+                                                            ...this.state.item,
+                                                            rating: res.data.rating
+                                                        },
+                                                        addingRate: false,
+                                                        setRating: res.data.rating,
+                                                    })
+                                                }
+                                            }}
+                                            disabled={
+                                                this.state.addingRating === 0
+                                            }
+                                        >{this.state.item.rating.filter(r => r.user_id === this.props.user?.user_id).length !== 0 && "修改"}評價</Button>
+                                    </> : (this.state.item.rating.filter(r => r.user_id === this.props.user?.user_id).length !== 0 ?
+                                            <Button
+                                                variant={"outlined"}
+                                                color={"warning"}
+                                                startIcon={<Edit/>}
+                                                onClick={() => {
+                                                    let ratings = this.state.item.rating.filter(r => r.user_id === this.props.user?.user_id)[0];
+                                                    console.log(ratings);
+                                                    this.setState(this.props.user?._id ? {
+                                                        addingRate: true,
+                                                        addingRateImgs: ratings.imageList,
+                                                        addingRating: ratings.rate,
+                                                        addingRateDesc: ratings.desc,
+                                                        addingRateAnonymous: ratings.anonymous ? ratings.anonymous : false,
+                                                    } : {needLoginSb: true});
+                                                }}
+                                            >修改評價</Button> : <Button
+                                                variant={"outlined"}
+                                                color={"warning"}
+                                                startIcon={<Add/>}
+                                                onClick={() => this.props.user?._id ? this.setState({addingRate: true}) : this.setState({needLoginSb: true})}
+                                            >評價</Button>
+                                    )}
+                                </Stack>
+                            </AccordionDetails>
+                        </Accordion>
                     </Box>
                 </Stack>
             </DialogContent>

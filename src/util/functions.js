@@ -42,7 +42,7 @@ export function transformObject(obj, prefix = "") {
     return result;
 };
 export const uploader = Uploader({
-    apiKey: "free" // Get production API keys from Bytescale
+    apiKey: "public_kW15bf94Uuq6JoVpKAARbeYqBZPb" // Get production API keys from Bytescale
 });
 export function getValueColor(value) {
     // Normalize the value to a range between 0 and 1

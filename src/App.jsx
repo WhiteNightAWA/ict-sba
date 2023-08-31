@@ -18,6 +18,7 @@ class App extends react.Component {
         if (darkMode === null) {
             const prefersDarkMode = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
             darkMode = prefersDarkMode ? "dark" : "light";
+            darkMode = "darkMode";
             window.localStorage.setItem("darkMode", darkMode);
         }
 

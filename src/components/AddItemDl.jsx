@@ -97,6 +97,7 @@ export class AddItemDl extends Component {
 
         if (this.props.edit) {
             this.props.closeDl();
+            this.setState({ loading: false });
             return await this.props.updateItem(data);
         }
 

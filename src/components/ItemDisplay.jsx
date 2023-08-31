@@ -784,12 +784,13 @@ export class ItemDisplay extends Component {
                     </Paper>
                 </Collapse>
                 {
-                    this.state.display === "card" ? <Container
+                    this.state.display === "card" ? <Box
                             sx={{
                                 mt: 3,
                                 display: "flex",
                                 flexWrap: "wrap",
                                 justifyContent: "space-around",
+                                alignItems: "center",
                                 overflow: "auto",
                                 width: "100%",
                             }}
@@ -832,14 +833,6 @@ export class ItemDisplay extends Component {
                                             <Skeleton variant="text" sx={{fontSize: '1rem'}}/>
                                             <Skeleton variant="text" sx={{fontSize: '1rem', width: "70%"}}/>
                                         </CardContent>
-                                        <CardActions disableSpacing>
-                                            <IconButton aria-label="add to favorites" disabled={true}>
-                                                <Favorite/>
-                                            </IconButton>
-                                            <IconButton aria-label="share" disabled={true}>
-                                                <Share/>
-                                            </IconButton>
-                                        </CardActions>
                                     </Card>)
                                 }) : this.getFiltedItems().length > 0 ? this.getFiltedItems().map((item, index) => {
                                     return (<Card sx={{
@@ -977,7 +970,7 @@ export class ItemDisplay extends Component {
                                                                     fontSize={"1.25rem"}>
                                                             <a style={{
                                                                 fontSize: "2.5rem"
-                                                            }}>${Math.min(...item.price.map(i => i[0] / i[1]))}</a><sub>/{item.unit}</sub>
+                                                            }}>${Math.ceil(Math.min(...item.price.map(i => i[0] / i[1]))*10)/10}</a><sub>/{item.unit}</sub>
                                                         </Typography>
                                                         {item.record.length < 1 ?
                                                             <Typography variant={"h4"} color={"red"}>
@@ -1003,12 +996,12 @@ export class ItemDisplay extends Component {
                                             justifyContent={"center"}>
                                     <Typography variant={"h1"} color={"gray"}>沒有搜尋結果</Typography>
                                 </Stack>}
-                        </Container> // Card UI
+                        </Box> // Card UI
                         :
-                        <Container
+                        <Box
                             sx={{
                                 overflow: "auto",
-                                width: "100%",
+                                width: "95%",
                             }}
                         >
                             <List sx={{
@@ -1133,7 +1126,7 @@ export class ItemDisplay extends Component {
                                                                 textAlign={"center"}>
                                                         <a style={{
                                                             fontSize: "2.5rem"
-                                                        }}>${Math.min(...item.price.map(i => i[0] / i[1]))}</a><sub>/{item.unit}</sub>
+                                                        }}>${Math.ceil(Math.min(...item.price.map(i => i[0] / i[1]))*10)/10}</a><sub>/{item.unit}</sub>
                                                     </Typography>
                                                     {item.record.length < 1 ?
                                                         <Typography variant={"h5"} color={"red"}
@@ -1215,7 +1208,7 @@ export class ItemDisplay extends Component {
                                                     color={"gray"}>沒有搜尋結果</Typography>
                                     </Stack>}
                             </List>
-                        </Container>
+                        </Box>
                 }
 
             </Stack>
