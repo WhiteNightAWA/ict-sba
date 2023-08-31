@@ -173,20 +173,21 @@ export class ItemDisplay extends Component {
                 pag: Array(res.data.items.length).fill(0),
                 noItem: res.data.items.length < 1
             });
+            setTimeout(() => {
+                if (window.location.href.includes("?")) {
+                    let obj = Object.fromEntries(new URLSearchParams(window.location.href.split("?")[1]));
 
-            if (window.location.href.includes("?")) {
-                let obj = Object.fromEntries(new URLSearchParams(window.location.href.split("?")[1]));
-
-                if (obj.itemId) {
-                    if (this.state.items.map(i => i._id.toString() === obj.itemId).includes(true)) {
-                        this.setState({
-                            selectedItem: this.state.items.filter(i => i._id.toString() === obj.itemId)[0]
-                        });
-                        delete obj.itemId;
-                        window.location.hash = window.location.hash.split("?")[0] + new URLSearchParams(obj).toString();
+                    if (obj.itemId) {
+                        if (this.state.items.map(i => i._id.toString() === obj.itemId).includes(true)) {
+                            this.setState({
+                                selectedItem: this.state.items.filter(i => i._id.toString() === obj.itemId)[0]
+                            });
+                            delete obj.itemId;
+                            window.location.hash = window.location.hash.split("?")[0] + new URLSearchParams(obj).toString();
+                        }
                     }
                 }
-            }
+            }, 100)
         } else {
             this.setState({
                 loading: false,
