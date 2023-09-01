@@ -59,7 +59,7 @@ import {
     uploader,
     getValueColor
 } from "../util/functions";
-import {ItemDisplay} from "../components/ItemDisplay";
+import {ItemDisplay} from "../components/shop/ItemDisplay";
 
 
 export default class Shop extends Component {

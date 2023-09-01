@@ -7,15 +7,16 @@ let url = !process.env.NODE_ENV || process.env.NODE_ENV === "development" ? "htt
 
 
 export default class Requires {
-    static async get(path: String) {
+    static async get(path: String, header: Object) {
         let res;
+        if (!header) { header = {} };
         try {
             if (cookie.load("jwt")) {
                 res = await Axios.get(url+path, {
-                    headers: { Authorization: `Bearer ${cookie.load("jwt")}` }
+                    headers: { Authorization: `Bearer ${cookie.load("jwt")}`, ...header }
                 });
             } else {
-                res = await Axios.get(url+path);
+                res = await Axios.get(url+path, { ...header });
             }
         } catch (err) {
             res = err.response;

@@ -48,15 +48,16 @@ import {
     FormatListBulleted,
     KeyboardArrowRight,
     ListAlt, MoreVert,
-    Replay, Share, Warning
+    Replay, Share, Star, Warning
 } from "@mui/icons-material";
-import {AutoPlaySwipeableViews, getValueColor, transformObject, uploader} from "../util/functions";
-import Pagination from "./Pagination";
+import {AutoPlaySwipeableViews, getValueColor, transformObject, uploader} from "../../util/functions";
+import Pagination from "../Pagination";
 import {AddItemDl} from "./AddItemDl";
-import Item from "../pages/Item";
-import Requires from "../util/requires";
-import {Component} from "react";
+import Item from "../../pages/Item";
+import Requires from "../../util/requires";
+import React, {Component} from "react";
 import {UploadDropzone} from "react-uploader";
+import {Rating} from "@mui/lab";
 
 export class ItemDisplay extends Component {
     constructor(props) {
@@ -956,7 +957,20 @@ export class ItemDisplay extends Component {
                                                         <Typography variant={"h3"}>
                                                             {item.name}
                                                         </Typography>
-                                                        <Typography variant={"p"} color={"gray"}>
+
+                                                        <Stack direction={"row"} alignItems={"center"}>
+                                                            <Rating
+                                                                readOnly
+                                                                value={[0, undefined].includes(item.rating?.length) ? 0 : item.rating.map(r => r.rate).reduce((a, c) => a + c) / item.rating.length}
+                                                                precision={0.5}
+                                                                icon={<Star/>}
+                                                                emptyIcon={<Star style={{opacity: 0.55}}/>}
+                                                            />
+                                                            <Typography color={"gray"} pl={1}>
+                                                                ({[0, undefined].includes(item.rating?.length) ? "暫無評價" : item.rating.length})
+                                                            </Typography>
+                                                        </Stack>
+                                                        <Typography variant={"h6"} color={"lightgray"}>
                                                             {item.desc}
                                                         </Typography>
                                                     </Stack>

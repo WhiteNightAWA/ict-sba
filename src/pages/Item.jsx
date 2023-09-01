@@ -9,9 +9,9 @@ import {
     DialogContent,
     DialogTitle, Divider, ImageList, ImageListItem, List, ListItem, Menu, MenuItem, Snackbar,
     Stack, TextField,
-    Typography, Rating, Checkbox, Tooltip, FormControlLabel, CardContent,
+    Typography, Rating, Checkbox, Tooltip, FormControlLabel, CardContent, CircularProgress,
 } from "@mui/material";
-import {AutoPlaySwipeableViews, getValueColor, uploader} from "../util/functions";
+import {AutoPlaySwipeableViews, getValueColor, uploader, colors} from "../util/functions";
 import Pagination from "../components/Pagination";
 import {
     ArrowRight, Check, Delete, Edit,
@@ -21,7 +21,7 @@ import {
 } from "@mui/icons-material";
 import {UploadDropzone, UploadButton} from "react-uploader";
 import Requires from "../util/requires";
-import {AddItemDl} from "../components/AddItemDl";
+import {AddItemDl} from "../components/shop/AddItemDl";
 import SwipeableViews from "react-swipeable-views";
 
 export default class Item extends Component {
@@ -56,9 +56,9 @@ export default class Item extends Component {
             ratedUser: [],
             ratedUserPags: [0, 0, 0],
             ratedUserPag: 0,
-        }
 
-        this.colors = ["goldenrod", "gold", "darkorange", "#ff5b00", "red"]
+            noRatedUser: false,
+        }
     }
 
     updateItem = async (update) => {
@@ -73,6 +73,7 @@ export default class Item extends Component {
     }
 
     loadRated = async () => {
+        this.setState({ noRatedUser: false })
         let ratedUser = []
         Array.from(this.state.setRating).splice(0, 3).map(async (item, index) => {
             let user = await Requires.get("/user/" + item.user_id);
@@ -85,7 +86,7 @@ export default class Item extends Component {
                 })
             }
         })
-        this.setState({ratedUser: ratedUser})
+        this.setState({ratedUser: ratedUser, noRatedUser: ratedUser.length === 0})
     }
 
     async componentDidMount() {
@@ -95,8 +96,8 @@ export default class Item extends Component {
                 shop: res.data,
                 setRating: this.state.item.rating ? this.state.item.rating : []
             });
+            setTimeout(async () => await this.loadRated(), 100)
         }
-        await this.loadRated()
     }
 
     render() {
@@ -570,7 +571,7 @@ export default class Item extends Component {
                                                         ><Box
                                                             height={"10px"}
                                                             borderRadius={"4px"}
-                                                            bgcolor={this.colors[index]}
+                                                            bgcolor={colors[index]}
                                                             sx={{
                                                                 transition: "width 0.5s"
                                                             }}
@@ -616,7 +617,7 @@ export default class Item extends Component {
                                         </Stack>
                                     </Stack>
                                     <Divider/>
-                                    <Stack width={"100%"} display={"related"} position={"relative"}>
+                                    <Stack width={"100%"} minHeight={"10em"} display={"related"} position={"relative"}>
                                         <Button sx={{
                                             height: "5em",
                                             position: "absolute",
@@ -625,7 +626,7 @@ export default class Item extends Component {
                                             zIndex: "999"
                                         }}
                                                 onClick={(e) => this.setState({ratedUserPag: this.state.ratedUserPag === 0 ? this.state.ratedUser.length - 1 : this.state.ratedUserPag - 1})}>
-                                            <ChevronLeft fontSize={"4em"}/>
+                                            <ChevronLeft fontSize={"large"}/>
                                         </Button>
                                         <Button sx={{
                                             height: "5em",
@@ -635,8 +636,21 @@ export default class Item extends Component {
                                             zIndex: "999"
                                         }}
                                                 onClick={(e) => this.setState({ratedUserPag: this.state.ratedUserPag === this.state.ratedUser.length - 1 ? 0 : this.state.ratedUserPag + 1})}>
-                                            <ChevronRight fontSize={"4em"}/>
+                                            <ChevronRight fontSize={"large"}/>
                                         </Button>
+                                        <Stack
+                                            sx={{
+                                                position: "absolute",
+                                                top: 0,
+                                                left: 0,
+                                                width: "100%",
+                                                height: "100%"
+                                            }}
+                                            alignItems={"center"}
+                                            justifyContent={"center"}
+                                        >
+                                            <CircularProgress size={"4em"}/>
+                                        </Stack>
                                         <SwipeableViews
                                             index={this.state.ratedUserPag}
                                             onChangeIndex={(i) => this.setState({ratedUserPag: i})}

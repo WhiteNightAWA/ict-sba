@@ -29,8 +29,9 @@ import {
 import {AnimatePresence, motion} from 'framer-motion';
 import ImageUploader from 'react-images-upload';
 import Item from "./Item";
-import {AddItemDl} from "../components/AddItemDl";
-import {ItemDisplay} from "../components/ItemDisplay";
+import {AddItemDl} from "../components/shop/AddItemDl";
+import {ItemDisplay} from "../components/shop/ItemDisplay";
+import {ShopRatingUI} from "../components/shop/ShopRatingUI";
 
 
 export default class MyShop extends Component {
@@ -52,11 +53,39 @@ export default class MyShop extends Component {
             noItem: false,
             selectedItem: null,
 
+            // rating
+            ratings: [],
+
             // sb
             sb: false,
             sbS: "",
             sbMsg: "",
         };
+    }
+
+    loadRating = async () => {
+        let res = await Requires.get("/shops/get/" + this.state.shop._id, {get_type: "rating"});
+
+        if (res.status === 200) {
+            let ratings = res.data.rating.flatMap((i, index) => {
+                let ls = i.rating.map((r, index) => {
+                    return {
+                        name: i.name,
+                        rating: i.rating,
+                        itemId: r._id,
+                        ...r
+                    }
+                });
+                return ls
+            })
+            this.setState({ratings: ratings})
+        } else {
+            this.setState({
+                sb: true,
+                sbS: "error",
+                sbMsg: res.data.error_description,
+            })
+        }
     }
 
     save = async () => {
@@ -97,6 +126,7 @@ export default class MyShop extends Component {
                         shop: {...shopRes.data},
                         savedShop: {...shopRes.data},
                     });
+                    setTimeout(async () => await this.loadRating(), 100);
                 } else {
                     window.location.href = "/#/";
                 }
@@ -344,10 +374,13 @@ export default class MyShop extends Component {
 
                                             <Stack direction={"row"} alignItems={"center"}>
 
-                                                <Rating name="read-only" value={this.state.shop.rating}
-                                                        readOnly/>
+                                                <Rating
+                                                    value={this.state.ratings.length !== 0 ? this.state.ratings.map(r => r.rate).reduce((a, c) => a + c) / this.state.ratings.map(r => r.rate).length : 0}
+                                                    precision={0.5}
+                                                    readOnly
+                                                />
                                                 <Typography color={"darkgrey"}>
-                                                    ({this.state.shop.rating?.length})
+                                                    ({this.state.ratings.length})
                                                 </Typography>
                                             </Stack>
                                         </Stack>
@@ -414,10 +447,14 @@ export default class MyShop extends Component {
                                 />
                             }
                         </TabPanel>
-                        <TabPanel value={"test"}>
-                            test
+                        <TabPanel value={"rating"} sx={{width: "100%"}}>
+                            <Stack width={"100%"} alignItems={"center"}>
+                                <ShopRatingUI
+                                    shop={this.state.shop}
+                                    ratings={this.state.ratings}
+                                />
+                            </Stack>
                         </TabPanel>
-
                     </TabContext>
                 </Stack>
             </Box>

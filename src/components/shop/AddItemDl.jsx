@@ -12,11 +12,11 @@ import {
     Typography
 } from "@mui/material";
 import {UploadDropzone} from "react-uploader";
-import {flattenObject, uploader} from "../util/functions";
+import {flattenObject, uploader} from "../../util/functions";
 import {ArrowRight, Clear, ExpandMore, KeyboardArrowRight} from "@mui/icons-material";
 import {LoadingButton} from "@mui/lab";
 import {Component} from "react";
-import Requires from "../util/requires";
+import Requires from "../../util/requires";
 
 export class AddItemDl extends Component {
     constructor(props) {

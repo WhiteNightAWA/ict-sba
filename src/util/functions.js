@@ -95,3 +95,4 @@ export function getValueColor(value) {
     return color;
 }
 
+export const colors = ["goldenrod", "gold", "darkorange", "#ff5b00", "red"];
