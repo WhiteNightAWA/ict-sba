@@ -143,7 +143,7 @@ export class ItemDisplay extends Component {
                         this.state.searchedSelect.map(r => i.selectedCategoryOther.startsWith(r)).includes(true) ||
                         this.state.searchedSelect.map(r => i.selectedCategory.map(j => j.startsWith(r)).includes(true)).includes(true)
                     )
-                )
+                ) && !i.deleted
         }).sort((a, b) => {
             switch (this.state.sort) {
                 case "price":
@@ -175,7 +175,12 @@ export class ItemDisplay extends Component {
                 noItem: res.data.items.length < 1
             });
             setTimeout(() => {
-                if (window.location.href.includes("?")) {
+                if (this.props.showItem) {
+                    this.setState({
+                        selectedItem: this.state.items.filter(i => i._id.toString() === this.props.showItem)[0]
+                    });
+                    this.props.clean();
+                } else if (window.location.href.includes("?")) {
                     let obj = Object.fromEntries(new URLSearchParams(window.location.href.split("?")[1]));
 
                     if (obj.itemId) {

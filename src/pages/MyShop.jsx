@@ -72,7 +72,10 @@ export default class MyShop extends Component {
                     return {
                         name: i.name,
                         rating: i.rating,
-                        itemId: r._id,
+                        itemId: i._id,
+                        itemImageList: i.imageList,
+                        visible: i.visible,
+                        deleted: i.deleted,
                         ...r
                     }
                 });
@@ -444,6 +447,8 @@ export default class MyShop extends Component {
                                 <ItemDisplay
                                     owner={true}
                                     shop={this.state.shop}
+                                    showItem={this.state.showItem}
+                                    clean={() => this.setState({ showItem: null })}
                                 />
                             }
                         </TabPanel>
@@ -452,6 +457,7 @@ export default class MyShop extends Component {
                                 <ShopRatingUI
                                     shop={this.state.shop}
                                     ratings={this.state.ratings}
+                                    showItem={(itemId) => this.setState({ tab: "item", showItem: itemId })}
                                 />
                             </Stack>
                         </TabPanel>

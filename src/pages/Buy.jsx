@@ -4,15 +4,55 @@ import {
     Card,
     CardHeader,
     IconButton,
-    CardContent,
-    CardActions, Skeleton
+    CardContent, ListItemIcon,
+    CardActions, Skeleton, Divider, Stack, List, MenuItem, Typography, ListItemText
 } from "@mui/material";
-import {Favorite, MoreVert, Share} from "@mui/icons-material";
+import {ArrowRight, Favorite, KeyboardDoubleArrowRight, MoreVert, Share} from "@mui/icons-material";
 import "../styles/Buy.css"
+import Requires from "../util/requires";
 
 class Buy extends Component {
+    constructor(props) {
+        super(props);
+
+        this.state = {
+            shops: []
+        };
+    }
+
+    async componentDidMount() {
+        let shops = await Requires.get("/temp/getShops");
+        if (shops.status === 200) {
+            this.setState({
+                shops: shops.data.shops,
+            })
+        }
+    }
+
     render() {
-        return (
+        return <Stack spacing={2} alignItems={"center"} width={"100%"}>
+            <Divider flexItem>臨時</Divider>
+            <Typography variant={"h4"}>
+                店鋪鏈接:
+            </Typography>
+            <List sx={{ width: "50%" }}>
+                {this.state.shops.map((shop, index) => {
+                    return <>
+                        <MenuItem onClick={(e) => window.location.hash = window.location.hash.replace(/#\/buy.*$|\/buy\?[^#]*/i, `#/shop/${shop._id}`)}>
+                            <ListItemText>
+                                <Typography variant={"h3"}>
+                                    {shop.shopName}
+                                </Typography>
+                            </ListItemText>
+                            <ListItemIcon>
+                                <KeyboardDoubleArrowRight />
+                            </ListItemIcon>
+                        </MenuItem>
+                        <Divider flexItem sx={{ m: 0 }}/>
+                    </>
+                })}
+            </List>
+            <Divider flexItem>臨時</Divider>
             <Container sx={{
                 mt: 5,
                 display: "flex",
@@ -54,7 +94,7 @@ class Buy extends Component {
                     </Card>)
                 })}
             </Container>
-        )
+        </Stack>
     }
 }
 

@@ -31,32 +31,29 @@ export class ShopRatingUI extends Component {
             ratedUserPags: [],
             pag: 0,
 
-            onPage: 10,
-            done: true,
+            onPage: 5,
         }
     }
 
     loadRating = async () => {
-        let rating = this.state.setRatings;
-        let filtedRating = rating;
+        let filtedRating = this.state.setRatings;
 
-        this.setState({lsRatings: [], ratedUserPags: [], done: false});
-        setTimeout(async () => {
-            filtedRating.map(async (r, index) => {
-                let user = await Requires.get("/user/" + r.user_id);
-                if (user.status === 200) {
-                    this.setState({
-                        lsRatings: [...this.state.lsRatings, {
-                            ...r,
-                            username: r.anonymous ? "匿名" : user.data.user.username,
-                            photoURL: r.anonymous ? "" : user.data.user.photoURL
-                        }],
-                        ratedUserPags: [...this.state.ratedUserPags, 0]
-                    })
-                }
-            });
-            this.setState({done: true})
-        }, 100)
+        let lsRating = [];
+        let ratedUserPags = [];
+        Array.from(filtedRating).splice(this.state.pag, this.state.onPage).map(async (r, index) => {
+            let user = await Requires.get("/user/" + r.user_id);
+            if (user.status === 200) {
+                lsRating.push({
+                    ...r,
+                    username: r.anonymous ? "匿名" : user.data.user.username,
+                    photoURL: r.anonymous ? "" : user.data.user.photoURL
+                });
+                ratedUserPags.push(0);
+            }
+            if (Array.from(filtedRating).splice(this.state.pag, this.state.onPage).length === index + 1) {
+                setTimeout(() => this.setState({lsRatings: lsRating, ratedUserPags: ratedUserPags}), 100);
+            }
+        });
     }
 
     async componentDidMount() {
@@ -149,8 +146,10 @@ export class ShopRatingUI extends Component {
                                 onChange={async (e, n) => {
                                     this.setState({
                                         ratingFilter: n,
+                                        pag: 0,
                                         setRatings: n ? this.state.ratings.filter(r => r.imageList.length !== 0) : this.state.ratings
                                     });
+                                    setTimeout(async() => await this.loadRating(), 100);
                                 }}
                             />}
                         />
@@ -158,11 +157,8 @@ export class ShopRatingUI extends Component {
                 </Stack>
                 <Divider flexItem sx={{width: "100%"}}/>
                 <Stack width={"90%"} spacing={4} alignItems={"center"} justifyContent={"space-between"}>
-                    <IconButton onClick={async () => await this.loadRating()}>
-                        <Replay/>
-                    </IconButton>
                     {this.state.lsRatings.map((r, index) => {
-                        return <Card elevation={12} sx={{m: "2em", width: "80%"}}>
+                        return <Card elevation={12} sx={{m: "2em", width: "80%"}} key={index}>
                             <CardHeader
                                 sx={{pb: 0}}
                                 avatar={
@@ -178,11 +174,19 @@ export class ShopRatingUI extends Component {
                                 title={<Typography
                                     variant={"h5"}>{r.username}</Typography>}
                             />
-                            <CardContent sx={{pt: 0}}>
-                                <Card elevation={12} sx={{m: 1}}>
-                                    <CardActionArea>
+                            <CardContent sx={{p: 1}}>
+                                <Card elevation={12} sx={(!r.visible || r.deleted) ? {m: 1} : {
+                                    m: 1,
+                                    backgroundImage: `url("${r.itemImageList[0]}")`,
+                                    backgroundRepeat: "no-repeat",
+                                    backgroundSize: "cover",
+                                    backgroundPosition: "center",
+                                }}>
+                                    <CardActionArea disabled={!r.visible || r.deleted} sx={(!r.visible || r.deleted) ? {backdropFilter: "blur(2px) brightness(0.6)"} : {backdropFilter: "blur(2px) brightness(0.4)"}} onClick={() => this.props.showItem(r.itemId)}>
                                         <CardContent>
-                                            <Stack direction={"row"} justifyContent={"space-between"} alignItems={"center"}>
+                                            <Stack direction={"row"} justifyContent={"space-between"}
+                                                   alignItems={"center"}>
+                                                {(r.visible && !r.deleted) ? <>
                                                 <Typography variant={"h6"}>
                                                     評價商品：
                                                 </Typography>
@@ -203,6 +207,9 @@ export class ShopRatingUI extends Component {
                                                         ({[0, undefined].includes(r.rating?.length) ? 0 : r.rating.length})
                                                     </Typography>
                                                 </Stack>
+                                                </> : <Typography variant={"h3"}>
+                                                    該商品已被刪除或隱藏
+                                                </Typography>}
                                             </Stack>
                                         </CardContent>
                                     </CardActionArea>
@@ -257,8 +264,11 @@ export class ShopRatingUI extends Component {
                         </Card>
                     })}
                     <Paginations
-                        count={Math.ceil(this.state.lsRatings.length / this.state.onPage)}
-                        onChange={(e, n) => this.setState({pag: n})}
+                        count={Math.ceil(this.state.setRatings.length / this.state.onPage)}
+                        onChange={async (e, n) => {
+                            this.setState({pag: n});
+                            setTimeout(async () => await this.loadRating(), 100)
+                        }}
                     />
                 </Stack>
             </Stack>

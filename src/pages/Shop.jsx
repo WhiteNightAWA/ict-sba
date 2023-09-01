@@ -60,6 +60,7 @@ import {
     getValueColor
 } from "../util/functions";
 import {ItemDisplay} from "../components/shop/ItemDisplay";
+import {ShopRatingUI} from "../components/shop/ShopRatingUI";
 
 
 export default class Shop extends Component {
@@ -93,6 +94,38 @@ export default class Shop extends Component {
             favorite: false,
             sort: "name",
             reverse: false,
+
+
+            // rating
+            ratings: [],
+        }
+    }
+
+    loadRating = async () => {
+        let res = await Requires.get("/shops/get/" + this.state.shop._id, {get_type: "rating"});
+
+        if (res.status === 200) {
+            let ratings = res.data.rating.flatMap((i, index) => {
+                let ls = i.rating.map((r, index) => {
+                    return {
+                        name: i.name,
+                        rating: i.rating,
+                        itemId: i._id,
+                        itemImageList: i.imageList,
+                        visible: i.visible,
+                        deleted: i.deleted,
+                        ...r
+                    }
+                });
+                return ls
+            })
+            this.setState({ratings: ratings})
+        } else {
+            this.setState({
+                sb: true,
+                sbS: "error",
+                sbMsg: res.data.error_description,
+            })
         }
     }
 
@@ -109,6 +142,8 @@ export default class Shop extends Component {
             this.setState({
                 shop: shopRes.data,
             })
+
+            setTimeout(async () => await this.loadRating(), 100);
         }
         let category = await Requires.get("/data/category")
         if (category.status === 200) {
@@ -226,10 +261,13 @@ export default class Shop extends Component {
 
                                                 <Stack direction={"row"} alignItems={"center"}>
 
-                                                    <Rating name="read-only" value={this.state.shop.rating}
-                                                            readOnly/>
+                                                    <Rating
+                                                        value={this.state.ratings.length !== 0 ? this.state.ratings.map(r => r.rate).reduce((a, c) => a + c) / this.state.ratings.map(r => r.rate).length : 0}
+                                                        precision={0.5}
+                                                        readOnly
+                                                    />
                                                     <Typography color={"darkgrey"}>
-                                                        ({this.state.shop.rating?.length})
+                                                        ({this.state.ratings.length})
                                                     </Typography>
                                                 </Stack>
                                             </Stack>
@@ -258,13 +296,20 @@ export default class Shop extends Component {
                                     <ItemDisplay
                                         owner={false}
                                         shop={this.state.shop}
+                                        showItem={this.state.showItem}
+                                        clean={() => this.setState({ showItem: null })}
                                     />
                                 }
                             </TabPanel>
-                            <TabPanel value={"rating"}>
-                                rating
+                            <TabPanel value={"rating"} sx={{ width: "100%" }}>
+                                <Stack width={"100%"} alignItems={"center"}>
+                                    <ShopRatingUI
+                                        shop={this.state.shop}
+                                        ratings={this.state.ratings}
+                                        showItem={(itemId) => this.setState({ tab: "item", showItem: itemId })}
+                                    />
+                                </Stack>
                             </TabPanel>
-
                         </TabContext>
                     </Stack> :
                     <Stack height={"80vh"} alignItems={"center"} justifyContent={"center"}>
