@@ -75,7 +75,7 @@ export class ItemDisplay extends Component {
             tab: "item",
 
             // item
-            items: [],
+            items: this.props.buy ? this.props.items : [],
             pag: [],
             noItem: false,
             selectedItem: null,
@@ -131,7 +131,7 @@ export class ItemDisplay extends Component {
         })
     }
     getFiltedItems = () => {
-        return this.state.items.filter((i) => {
+        return this.props.buy ? this.props.items : this.state.items.filter((i) => {
             return (this.state.user.favorited?.includes(i._id.toString()) || !this.state.favorite) &&
                 (this.state.search === "" || (
                     i.name.toLowerCase().includes(this.state.search.toLowerCase()) ||
@@ -167,38 +167,44 @@ export class ItemDisplay extends Component {
         })
     }
     loadItem = async () => {
-        let res = this.props.owner ? await Requires.get("/shops/items!/" + this.state.shop._id) : await Requires.get("/shops/items/" + this.state.shop._id);
-        if (res.status === 200) {
+        if (this.props.buy) {
             this.setState({
-                items: res.data.items,
-                pag: Array(res.data.items.length).fill(0),
-                noItem: res.data.items.length < 1
-            });
-            setTimeout(() => {
-                if (this.props.showItem) {
-                    this.setState({
-                        selectedItem: this.state.items.filter(i => i._id.toString() === this.props.showItem)[0]
-                    });
-                    this.props.clean();
-                } else if (window.location.href.includes("?")) {
-                    let obj = Object.fromEntries(new URLSearchParams(window.location.href.split("?")[1]));
+                items: this.props.items
+            })
+        } else {
+            let res = this.props.owner ? await Requires.get("/shops/items!/" + this.state.shop?._id) : await Requires.get("/shops/items/" + this.state.shop?._id);
+            if (res.status === 200) {
+                this.setState({
+                    items: res.data.items,
+                    pag: Array(res.data.items.length).fill(0),
+                    noItem: res.data.items.length < 1
+                });
+                setTimeout(() => {
+                    if (this.props.showItem) {
+                        this.setState({
+                            selectedItem: this.state.items.filter(i => i._id.toString() === this.props.showItem)[0]
+                        });
+                        this.props.clean();
+                    } else if (window.location.href.includes("?")) {
+                        let obj = Object.fromEntries(new URLSearchParams(window.location.href.split("?")[1]));
 
-                    if (obj.itemId) {
-                        if (this.state.items.map(i => i._id.toString() === obj.itemId).includes(true)) {
-                            this.setState({
-                                selectedItem: this.state.items.filter(i => i._id.toString() === obj.itemId)[0]
-                            });
-                            delete obj.itemId;
-                            window.location.hash = window.location.hash.split("?")[0] + new URLSearchParams(obj).toString();
+                        if (obj.itemId) {
+                            if (this.state.items.map(i => i._id.toString() === obj.itemId).includes(true)) {
+                                this.setState({
+                                    selectedItem: this.state.items.filter(i => i._id.toString() === obj.itemId)[0]
+                                });
+                                delete obj.itemId;
+                                window.location.hash = window.location.hash.split("?")[0] + new URLSearchParams(obj).toString();
+                            }
                         }
                     }
-                }
-            }, 100)
-        } else {
-            this.setState({
-                loading: false,
-                sb: true, sbS: "error", sbMsg: res.data.error_description
-            });
+                }, 100)
+            } else {
+                this.setState({
+                    loading: false,
+                    sb: true, sbS: "error", sbMsg: res.data.error_description
+                });
+            }
         }
     }
 
@@ -217,6 +223,9 @@ export class ItemDisplay extends Component {
         }
         await this.loadItem();
     }
+
+
+
 
     render() {
         return <>
@@ -329,153 +338,154 @@ export class ItemDisplay extends Component {
                     color={"success"}
                     onClick={(e) => this.setState({addDl: true})}
                 >新增商品</Button>}
-                <Paper
-                    sx={{
-                        bgcolor: "rgba(0,0,0,0.1)",
-                        width: "100%",
-                        height: "3em",
-                        mt: 1
-                    }}
-                >
-                    <Stack direction={"row"} justifyContent={"space-around"} spacing={4} height={"100%"}
-                           alignItems={"center"}
+                {!this.props.buy &&
+                    <Paper
+                        sx={{
+                            bgcolor: "rgba(0,0,0,0.1)",
+                            width: "100%",
+                            height: "3em",
+                            mt: 1
+                        }}
                     >
-                        <TextField
-                            label={"搜尋"}
-                            variant={"filled"}
-                            size={"small"}
-                            value={this.state.search}
-                            onChange={(e) => this.setState({search: e.target.value})}
-                        />
-                        <Stack direction={"row"} justifyContent={"center"}>
-                            <ToggleButton
-                                value={"listAlt"}
-                                selected={this.state.searchLs}
-                                onClick={(e) => this.setState({searchLs: !this.state.searchLs})}
-                            >
-                                <ListAlt/>
-                            </ToggleButton>
-                            <Autocomplete
-                                disabled={this.state.loading}
-                                multiple
-                                sx={{width: "20em", height: "3em"}}
-                                value={this.state.searchedSelect}
-                                options={transformObject(this.state.category)}
-                                onChange={(e, v) => this.setState({searchedSelect: v})}
-                                getOptionLabel={(option) => option}
-                                renderTags={(value, getTagProps) => {
-                                    return value.map((option, index) => (
-                                        <Tooltip
-                                            title={<Typography
-                                                fontSize={"1.5em"}>{option}</Typography>}
-                                            sx={{
-                                                fontSize: "2em"
-                                            }}>
-                                            <Chip
-                                                key={option}
-                                                label={option.split(" > ").pop()}
-                                                {...getTagProps({index})}
-                                                size={"small"}
+                        <Stack direction={"row"} justifyContent={"space-around"} spacing={4} height={"100%"}
+                               alignItems={"center"}
+                        >
+                            <TextField
+                                label={"搜尋"}
+                                variant={"filled"}
+                                size={"small"}
+                                value={this.state.search}
+                                onChange={(e) => this.setState({search: e.target.value})}
+                            />
+                            <Stack direction={"row"} justifyContent={"center"}>
+                                <ToggleButton
+                                    value={"listAlt"}
+                                    selected={this.state.searchLs}
+                                    onClick={(e) => this.setState({searchLs: !this.state.searchLs})}
+                                >
+                                    <ListAlt/>
+                                </ToggleButton>
+                                <Autocomplete
+                                    disabled={this.state.loading}
+                                    multiple
+                                    sx={{width: "20em", height: "3em"}}
+                                    value={this.state.searchedSelect}
+                                    options={transformObject(this.state.category)}
+                                    onChange={(e, v) => this.setState({searchedSelect: v})}
+                                    getOptionLabel={(option) => option}
+                                    renderTags={(value, getTagProps) => {
+                                        return value.map((option, index) => (
+                                            <Tooltip
+                                                title={<Typography
+                                                    fontSize={"1.5em"}>{option}</Typography>}
                                                 sx={{
-                                                    fontSize: "0.75rem"
-                                                }}
-                                            />
-                                        </Tooltip>
-                                    ))
-                                }}
-                                renderInput={(params) => (
-                                    <TextField
-                                        {...params}
-                                        disabled={this.state.loading}
-                                        label={"類別搜尋"}
+                                                    fontSize: "2em"
+                                                }}>
+                                                <Chip
+                                                    key={option}
+                                                    label={option.split(" > ").pop()}
+                                                    {...getTagProps({index})}
+                                                    size={"small"}
+                                                    sx={{
+                                                        fontSize: "0.75rem"
+                                                    }}
+                                                />
+                                            </Tooltip>
+                                        ))
+                                    }}
+                                    renderInput={(params) => (
+                                        <TextField
+                                            {...params}
+                                            disabled={this.state.loading}
+                                            label={"類別搜尋"}
+                                            variant={"filled"}
+                                            size={"small"}
+                                            width={"20em"}
+                                            sx={{
+                                                borderTopRightRadius: "0 !important",
+                                            }}
+                                        />
+                                    )}
+                                />
+                            </Stack>
+                            <Stack direction={"row"}>
+                                <FormControl sx={{width: "10em"}}>
+                                    <InputLabel id="item-sort-by-label" variant={"filled"}
+                                                size={"small"}>排序方式</InputLabel>
+                                    <Select
+                                        labelId="item-sort-by-label"
+                                        value={this.state.sort}
+                                        label="排序方式"
                                         variant={"filled"}
                                         size={"small"}
-                                        width={"20em"}
-                                        sx={{
-                                            borderTopRightRadius: "0 !important",
-                                        }}
-                                    />
-                                )}
-                            />
+                                        onChange={(e) => this.setState({sort: e.target.value})}
+                                    >
+                                        <MenuItem value={"name"}>名稱</MenuItem>
+                                        <MenuItem value={"price"}>價格</MenuItem>
+                                        <MenuItem value={"fresh"}>新鮮</MenuItem>
+                                    </Select>
+                                </FormControl>
 
-                        </Stack>
-                        <Stack direction={"row"}>
-                            <FormControl sx={{width: "10em"}}>
-                                <InputLabel id="item-sort-by-label" variant={"filled"}
-                                            size={"small"}>排序方式</InputLabel>
-                                <Select
-                                    labelId="item-sort-by-label"
-                                    value={this.state.sort}
-                                    label="排序方式"
-                                    variant={"filled"}
-                                    size={"small"}
-                                    onChange={(e) => this.setState({sort: e.target.value})}
+                                <IconButton
+                                    onClick={(e) => this.setState({reverse: !this.state.reverse})}
+                                    sx={{
+                                        rotate: this.state.reverse ? "180deg" : "0deg",
+                                        transition: "rotate 1s",
+                                        width: "2em",
+                                    }}
                                 >
-                                    <MenuItem value={"name"}>名稱</MenuItem>
-                                    <MenuItem value={"price"}>價格</MenuItem>
-                                    <MenuItem value={"fresh"}>新鮮</MenuItem>
-                                </Select>
-                            </FormControl>
+                                    <ExpandMore/>
+                                </IconButton>
+                            </Stack>
 
-                            <IconButton
-                                onClick={(e) => this.setState({reverse: !this.state.reverse})}
-                                sx={{
-                                    rotate: this.state.reverse ? "180deg" : "0deg",
-                                    transition: "rotate 1s",
-                                    width: "2em",
+                            <ToggleButton
+                                selected={this.state.favorite}
+
+                                animate={{scale: [1, 1.3, 0.8, 1.2, 1]}}
+                                transition={{duration: 0.5}}
+                                onClick={(e) => this.setState({favorite: !this.state.favorite})}
+                                sx={this.state.favorite && {
+                                    color: "red !important"
                                 }}
                             >
-                                <ExpandMore/>
+                                <Favorite/>
+                            </ToggleButton>
+
+                            <ToggleButtonGroup
+                                value={this.state.display}
+                                onChange={(e, n) => this.setState({display: n === null ? this.state.display : n})}
+                                exclusive
+                            >
+                                <ToggleButton value={"list"}>
+                                    <FormatListBulleted/>
+                                </ToggleButton>
+                                <ToggleButton value={"card"}>
+                                    <Dashboard/>
+                                </ToggleButton>
+                            </ToggleButtonGroup>
+
+
+                            <IconButton
+                                onClick={async () => {
+                                    this.setState({rotateReload: true, items: [], noItem: false});
+                                    setTimeout(async () => {
+                                        await this.loadItem();
+                                        setTimeout(() => {
+                                            this.setState({rotateReload: false});
+                                        }, 500);
+                                    }, 500);
+                                }}
+                            >
+                                <Replay
+                                    sx={{
+                                        transition: this.state.rotateReload ? "rotate 0.5s" : "",
+                                        rotate: this.state.rotateReload ? '-405deg' : '-45deg',
+                                    }}
+                                />
                             </IconButton>
                         </Stack>
-
-                        <ToggleButton
-                            selected={this.state.favorite}
-
-                            animate={{scale: [1, 1.3, 0.8, 1.2, 1]}}
-                            transition={{duration: 0.5}}
-                            onClick={(e) => this.setState({favorite: !this.state.favorite})}
-                            sx={this.state.favorite && {
-                                color: "red !important"
-                            }}
-                        >
-                            <Favorite/>
-                        </ToggleButton>
-
-                        <ToggleButtonGroup
-                            value={this.state.display}
-                            onChange={(e, n) => this.setState({display: n === null ? this.state.display : n})}
-                            exclusive
-                        >
-                            <ToggleButton value={"list"}>
-                                <FormatListBulleted/>
-                            </ToggleButton>
-                            <ToggleButton value={"card"}>
-                                <Dashboard/>
-                            </ToggleButton>
-                        </ToggleButtonGroup>
-
-
-                        <IconButton
-                            onClick={async () => {
-                                this.setState({rotateReload: true, items: [], noItem: false});
-                                setTimeout(async () => {
-                                    await this.loadItem();
-                                    setTimeout(() => {
-                                        this.setState({rotateReload: false});
-                                    }, 500);
-                                }, 500);
-                            }}
-                        >
-                            <Replay
-                                sx={{
-                                    transition: this.state.rotateReload ? "rotate 0.5s" : "",
-                                    rotate: this.state.rotateReload ? '-405deg' : '-45deg',
-                                }}
-                            />
-                        </IconButton>
-                    </Stack>
-                </Paper>
+                    </Paper>
+                }
 
                 <Collapse in={this.state.searchLs} timeout={1000} sx={{width: "97%"}}>
                     <Paper sx={{
@@ -790,7 +800,7 @@ export class ItemDisplay extends Component {
                     </Paper>
                 </Collapse>
                 {
-                    this.state.display === "card" ? <Box
+                    (this.props.buy ? this.props.display : this.state.display) === "card" ? <Box
                             sx={{
                                 mt: 3,
                                 display: "flex",
@@ -806,7 +816,7 @@ export class ItemDisplay extends Component {
                                 <Stack sx={{width: "90%", height: "50vh"}} alignItems={"center"}
                                        justifyContent={"center"}>
                                     <Typography variant={"h1"} color={"gray"}>暫無商品</Typography>
-                                </Stack> : this.state.items.length === 0 ? [345, 551, 642, 352, 465, 522].map((item, index) => {
+                                </Stack> : (this.props.buy ? this.props.items : this.state.items).length === 0 ? [345, 551, 642, 352, 465, 522].map((item, index) => {
                                     return (<Card sx={{
                                         width: item,
                                         m: 3,
@@ -852,8 +862,8 @@ export class ItemDisplay extends Component {
                                         <CardHeader
                                             avatar={
                                                 <Avatar
-                                                    src={this.state.shop.avatar}
-                                                    alt={this.state.shop.shopName}
+                                                    src={this.props.buy ? this.props.shops[index]?.avatar : this.state.shop.avatar}
+                                                    alt={this.props.buy ? this.props.shops[index]?.shopName : this.state.shop.shopName}
                                                     sx={{
                                                         height: 40,
                                                         width: 40
@@ -865,39 +875,43 @@ export class ItemDisplay extends Component {
                                                     {this.state.user?.favorited?.includes(item._id) ? <IconButton
                                                         onClick={async () => await this.onFavorite(true, item._id)}
                                                     >
-                                                        <Favorite sx={{ color: "red" }}/>
+                                                        <Favorite sx={{color: "red"}}/>
                                                     </IconButton> : <IconButton
-                                                        onClick={async () => this.state.user?._id ? await this.onFavorite(false, item._id) : this.setState({ needLoginSb: true })}
+                                                        onClick={async () => this.state.user?._id ? await this.onFavorite(false, item._id) : this.setState({needLoginSb: true})}
                                                     >
                                                         <Favorite/>
                                                     </IconButton>}
                                                     {this.state.copied === item._id ? <IconButton
                                                         onClick={() => {
                                                             this.setState({copied: item._id})
-                                                            navigator.clipboard.writeText(window.location.host + `/#/shop/${this.state.shop._id}?itemId=${item._id}`);
+                                                            navigator.clipboard.writeText("https://" + window.location.host + `/#/shop/${item.shopId}?itemId=${item._id}`);
                                                             setTimeout(() => this.setState({copied: null}), 1000);
                                                         }}
                                                     >
-                                                        <Check sx={{ color: "lightgreen" }}/>
+                                                        <Check sx={{color: "lightgreen"}}/>
                                                     </IconButton> : <IconButton
                                                         onClick={() => {
                                                             this.setState({copied: item._id})
-                                                            navigator.clipboard.writeText(window.location.host + (process.env.REACT_APP_HERF !== undefined ? process.env.REACT_APP_HERF : "") + `/#/shop/${this.state.shop._id}?itemId=${item._id}`);
+                                                            navigator.clipboard.writeText("https://" + window.location.host + (process.env.REACT_APP_HERF !== undefined ? process.env.REACT_APP_HERF : "") + `/#/shop/${item.shopId}?itemId=${item._id}`);
                                                             setTimeout(() => this.setState({copied: null}), 1000);
                                                         }}
                                                     >
                                                         <Share/>
                                                     </IconButton>}
 
-                                                    <IconButton onClick={(e) => this.setState({ menu: e.currentTarget })}>
+                                                    <IconButton onClick={(e) => this.setState({menu: e.currentTarget})}>
                                                         <MoreVert/>
                                                     </IconButton>
-                                                    <Menu open={this.state.menu} anchorEl={this.state.menu} onClose={() => this.setState({ menu: null })}>
+                                                    <Menu open={this.state.menu} anchorEl={this.state.menu}
+                                                          onClose={() => this.setState({menu: null})}>
                                                         <MenuItem
-                                                            onClick={() => this.state.user?._id ? this.setState({reportDl: true, menu: null}) : this.setState({ needLoginSb: true, menu: null })}
+                                                            onClick={() => this.state.user?._id ? this.setState({
+                                                                reportDl: true,
+                                                                menu: null
+                                                            }) : this.setState({needLoginSb: true, menu: null})}
                                                         >
                                                             <ListItemIcon>
-                                                                <Warning />
+                                                                <Warning/>
                                                             </ListItemIcon>
                                                             <ListItemText>
                                                                 Report
@@ -907,10 +921,10 @@ export class ItemDisplay extends Component {
                                                 </>
                                             }
                                             title={<Typography
-                                                variant={"h5"}>{this.state.shop.shopName}</Typography>}
+                                                variant={"h5"}>{this.props.buy ? this.props.shops[index]?.shopName : this.state.shop.shopName}</Typography>}
                                             subheader={<Typography
                                                 sx={{fontSize: '1rem', width: "60%"}}>
-                                                {this.state.shop.short && this.state.shop.short + " - "}
+                                                {this.props.buy ? this.props.shops[index]?.short : this.state.shop.short}
                                             </Typography>}
                                         />
                                         {
@@ -975,7 +989,7 @@ export class ItemDisplay extends Component {
                                                                 ({[0, undefined].includes(item.rating?.length) ? "暫無評價" : item.rating.length})
                                                             </Typography>
                                                         </Stack>
-                                                        <Typography variant={"h6"} color={"lightgray"}>
+                                                        <Typography variant={"h6"} color={"lightgray"} maxWidth={"20em"}>
                                                             {item.desc}
                                                         </Typography>
                                                     </Stack>
@@ -989,7 +1003,7 @@ export class ItemDisplay extends Component {
                                                                     fontSize={"1.25rem"}>
                                                             <a style={{
                                                                 fontSize: "2.5rem"
-                                                            }}>${Math.ceil(Math.min(...item.price.map(i => i[0] / i[1]))*10)/10}</a><sub>/{item.unit}</sub>
+                                                            }}>${Math.ceil(Math.min(...item.price.map(i => i[0] / i[1])) * 10) / 10}</a><sub>/{item.unit}</sub>
                                                         </Typography>
                                                         {item.record.length < 1 ?
                                                             <Typography variant={"h4"} color={"red"}>
@@ -1035,7 +1049,7 @@ export class ItemDisplay extends Component {
                                            justifyContent={"center"}>
                                         <Typography variant={"h1"}
                                                     color={"gray"}>暫無商品</Typography>
-                                    </Stack> : this.state.items.length === 0 ? [345, 551, 642, 352, 465, 522].map((item, index) => {
+                                    </Stack> : (this.props.buy ? this.props.items : this.state.items).length === 0 ? [345, 551, 642, 352, 465, 522].map((item, index) => {
                                         return <>
                                             <ListItem sx={{
                                                 transition: "background-color 0.5s",
@@ -1086,7 +1100,7 @@ export class ItemDisplay extends Component {
                                                     </IconButton>
                                                 </Stack>
                                             </ListItem>
-                                            {index + 1 !== this.state.items.length &&
+                                            {index + 1 !== (this.props.buy ? this.props.items : this.state.items).length &&
                                                 <Divider/>}
                                         </>
                                     }) : this.getFiltedItems().length > 0 ? this.getFiltedItems().map((item, index) => {
@@ -1105,8 +1119,8 @@ export class ItemDisplay extends Component {
                                                        alignItems={"center"}
                                                 >
                                                     <Avatar
-                                                        src={this.state.shop.avatar}
-                                                        alt={this.state.shop.shopName}
+                                                        src={this.props.buy ? this.props.shops[index]?.avatar : this.state.shop.avatar}
+                                                        alt={this.props.buy ? this.props.shops[index]?.shopName : this.state.shop.shopName}
                                                         sx={{
                                                             height: 50,
                                                             width: 50
@@ -1114,12 +1128,12 @@ export class ItemDisplay extends Component {
                                                     />
                                                     <Stack>
                                                         <Typography
-                                                            variant={"h5"}>{this.state.shop.shopName}</Typography>
+                                                            variant={"h5"}>{this.props.buy ? this.props.shops[index]?.shopName : this.state.shop.shopName}</Typography>
                                                         <Typography sx={{
                                                             fontSize: '1rem',
                                                             width: "60%"
                                                         }}>
-                                                            {this.state.shop.short && this.state.shop.short}
+                                                            {this.props.buy ? this.props.shops[index]?.short : this.state.shop.short}
                                                         </Typography>
                                                     </Stack>
                                                 </Stack>
@@ -1145,7 +1159,7 @@ export class ItemDisplay extends Component {
                                                                 textAlign={"center"}>
                                                         <a style={{
                                                             fontSize: "2.5rem"
-                                                        }}>${Math.ceil(Math.min(...item.price.map(i => i[0] / i[1]))*10)/10}</a><sub>/{item.unit}</sub>
+                                                        }}>${Math.ceil(Math.min(...item.price.map(i => i[0] / i[1])) * 10) / 10}</a><sub>/{item.unit}</sub>
                                                     </Typography>
                                                     {item.record.length < 1 ?
                                                         <Typography variant={"h5"} color={"red"}
@@ -1173,39 +1187,43 @@ export class ItemDisplay extends Component {
                                                     {this.state.user?.favorited?.includes(item._id) ? <IconButton
                                                         onClick={async () => await this.onFavorite(true, item._id)}
                                                     >
-                                                        <Favorite sx={{ color: "red" }}/>
+                                                        <Favorite sx={{color: "red"}}/>
                                                     </IconButton> : <IconButton
-                                                        onClick={async () => this.state.user?._id ? await this.onFavorite(false, item._id) : this.setState({ needLoginSb: true })}
+                                                        onClick={async () => this.state.user?._id ? await this.onFavorite(false, item._id) : this.setState({needLoginSb: true})}
                                                     >
                                                         <Favorite/>
                                                     </IconButton>}
                                                     {this.state.copied === item._id ? <IconButton
                                                         onClick={() => {
                                                             this.setState({copied: item._id})
-                                                            navigator.clipboard.writeText(window.location.host + `/#/shop/${this.state.shop._id}?itemId=${item._id}`);
+                                                            navigator.clipboard.writeText("https://" + window.location.host + `/#/shop/${item.shopId}?itemId=${item._id}`);
                                                             setTimeout(() => this.setState({copied: null}), 1000);
                                                         }}
                                                     >
-                                                        <Check sx={{ color: "lightgreen" }}/>
+                                                        <Check sx={{color: "lightgreen"}}/>
                                                     </IconButton> : <IconButton
                                                         onClick={() => {
                                                             this.setState({copied: item._id})
-                                                            navigator.clipboard.writeText(window.location.host + (process.env.REACT_APP_HERF !== undefined ? process.env.REACT_APP_HERF : "") + `/#/shop/${this.state.shop._id}?itemId=${item._id}`);
+                                                            navigator.clipboard.writeText("https://" + window.location.host + (process.env.REACT_APP_HERF !== undefined ? process.env.REACT_APP_HERF : "") + `/#/shop/${item.shopId}?itemId=${item._id}`);
                                                             setTimeout(() => this.setState({copied: null}), 1000);
                                                         }}
                                                     >
                                                         <Share/>
                                                     </IconButton>}
 
-                                                    <IconButton onClick={(e) => this.setState({ menu: e.currentTarget })}>
+                                                    <IconButton onClick={(e) => this.setState({menu: e.currentTarget})}>
                                                         <MoreVert/>
                                                     </IconButton>
-                                                    <Menu open={this.state.menu} anchorEl={this.state.menu} onClose={() => this.setState({ menu: null })}>
+                                                    <Menu open={this.state.menu} anchorEl={this.state.menu}
+                                                          onClose={() => this.setState({menu: null})}>
                                                         <MenuItem
-                                                            onClick={() => this.state.user?._id ? this.setState({reportDl: true, menu: null}) : this.setState({ needLoginSb: true, menu: null })}
+                                                            onClick={() => this.state.user?._id ? this.setState({
+                                                                reportDl: true,
+                                                                menu: null
+                                                            }) : this.setState({needLoginSb: true, menu: null})}
                                                         >
                                                             <ListItemIcon>
-                                                                <Warning />
+                                                                <Warning/>
                                                             </ListItemIcon>
                                                             <ListItemText>
                                                                 Report
@@ -1216,7 +1234,7 @@ export class ItemDisplay extends Component {
 
                                             </Stack>
                                             {
-                                                index + 1 !== this.state.items.length &&
+                                                index + 1 !== (this.props.buy ? this.props.items : this.state.items).length &&
                                                 <Divider/>
                                             }
                                         </>
@@ -1251,7 +1269,6 @@ export class ItemDisplay extends Component {
                         item={this.state.selectedItem}
                         favorited={this.state.user.favorited}
                         onFavorite={this.onFavorite}
-                        shopId={this.state.shop._id}
                         loadItem={this.loadItem}
                         category={this.state.category}
                         close={() => this.setState({selectedItem: null})}

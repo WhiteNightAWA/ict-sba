@@ -608,6 +608,7 @@ export default class Item extends Component {
                                                     onChange={async (e, n) => {
                                                         this.setState({
                                                             ratingFilter: n,
+                                                            ratedUserPag: 0,
                                                             setRating: n ? this.state.item.rating.filter(r => r.imageList.length !== 0) : this.state.item.rating
                                                         });
                                                         setTimeout(async () => await this.loadRated(), 100);

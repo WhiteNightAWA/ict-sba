@@ -36,7 +36,7 @@ import {
     ListItemButton,
     Checkbox,
     ListItem,
-    Divider, CardActionArea
+    Divider, CardActionArea, CircularProgress
 } from "@mui/material";
 import Pagination from "../components/Pagination";
 import {
@@ -98,6 +98,9 @@ export default class Shop extends Component {
 
             // rating
             ratings: [],
+
+
+            loading: true,
         }
     }
 
@@ -144,6 +147,10 @@ export default class Shop extends Component {
             })
 
             setTimeout(async () => await this.loadRating(), 100);
+        } else {
+            this.setState({
+                loading: false,
+            })
         }
         let category = await Requires.get("/data/category")
         if (category.status === 200) {
@@ -312,7 +319,9 @@ export default class Shop extends Component {
                             </TabPanel>
                         </TabContext>
                     </Stack> :
-                    <Stack height={"80vh"} alignItems={"center"} justifyContent={"center"}>
+                    (this.state.loading ? <Stack height={"80vh"} alignItems={"center"} justifyContent={"center"}>
+                        <CircularProgress size={"10em"} />
+                    </Stack> : <Stack height={"80vh"} alignItems={"center"} justifyContent={"center"}>
                         <DoNotDisturb sx={{fontSize: "20em"}}/>
                         <Typography variant={"h1"}>
                             Shop Not Found! :(
@@ -320,7 +329,8 @@ export default class Shop extends Component {
                         <Button size={"large"} onClick={(e) => window.location.hash = "/buy"}>
                             Back
                         </Button>
-                    </Stack>}
+                    </Stack>)
+                }
             </Box>
         )
     }
