@@ -88,7 +88,6 @@ class AppBar extends Component {
         super(props);
         this.state = {
             tabs: [
-                ["主頁", <Home/>, "home"],
                 ["BUY", <LocalMall/>, "buy"],
             ],
             tab: "home",

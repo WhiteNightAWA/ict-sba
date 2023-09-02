@@ -1041,7 +1041,8 @@ export class ItemDisplay extends Component {
                                 bgcolor: "rgba(255,255,255,0.1)",
                                 borderRadius: "0 0 4px 4px",
                                 boxShadow: "rgba(0,0,0,0.5) 0 5px 1em",
-                                mb: "1em"
+                                mb: "1em",
+                                overflowX: "hidden"
                             }}>
                                 {this.state.noItem ?
                                     <Stack sx={{width: "100%", height: "50vh"}}
