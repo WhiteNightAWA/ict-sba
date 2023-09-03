@@ -96,7 +96,10 @@ export default class MyShop extends Component {
             loading: true,
         });
 
-        const res = await Requires.post("/users/update", this.state.shop);
+        const res = await Requires.post("/users/update", {
+            type: "shop",
+            upate: this.state.shop,
+        });
 
         if (res.status === 200) {
             this.setState({
