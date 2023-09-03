@@ -30,12 +30,19 @@ export class ShopRatingUI extends Component {
             lsRatings: [],
             ratedUserPags: [],
             pag: 0,
+            ratingFilter: window.localStorage.getItem("ratingFilter") === "true",
+
 
             onPage: 5,
         }
     }
 
     loadRating = async () => {
+        this.setState({
+            setRatings: this.state.ratingFilter ? this.state.ratings.filter(r => r.imageList.length !== 0) : this.state.ratings,
+            noRatedUser: false
+        });
+        await new Promise(resolve => setTimeout(resolve, 100));
         let filtedRating = this.state.setRatings;
 
         let lsRating = [];
@@ -143,11 +150,11 @@ export class ShopRatingUI extends Component {
                             control={<Checkbox
                                 sx={{pt: 1}}
                                 value={this.state.ratingFilter}
+                                checked={this.state.ratingFilter}
                                 onChange={async (e, n) => {
                                     this.setState({
                                         ratingFilter: n,
                                         pag: 0,
-                                        setRatings: n ? this.state.ratings.filter(r => r.imageList.length !== 0) : this.state.ratings
                                     });
                                     setTimeout(async() => await this.loadRating(), 100);
                                 }}

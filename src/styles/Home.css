@@ -1,0 +1,14 @@
+@keyframes textGradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+.background-gradient {
+    background: linear-gradient(-45deg, #ff00cc, #3333ff, #00ff00);
+    background-size: 200% 200%;
+    animation: textGradient 5s ease-in-out infinite;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    color: transparent;
+}

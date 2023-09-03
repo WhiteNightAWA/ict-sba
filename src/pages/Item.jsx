@@ -58,6 +58,8 @@ export default class Item extends Component {
             ratedUserPag: 0,
 
             noRatedUser: false,
+            ratingFilter: window.localStorage.getItem("ratingFilter") === "true",
+
         }
     }
 
@@ -73,7 +75,11 @@ export default class Item extends Component {
     }
 
     loadRated = async () => {
-        this.setState({ noRatedUser: false })
+        this.setState({
+            setRating: this.state.ratingFilter ? this.state.item.rating.filter(r => r.imageList.length !== 0) : this.state.item.rating,
+            noRatedUser: false
+        });
+        await new Promise(resolve => setTimeout(resolve, 100));
         let ratedUser = []
         Array.from(this.state.setRating).splice(0, 3).map(async (item, index) => {
             let user = await Requires.get("/user/" + item.user_id);
@@ -605,11 +611,11 @@ export default class Item extends Component {
                                                 control={<Checkbox
                                                     sx={{pt: 1}}
                                                     value={this.state.ratingFilter}
+                                                    checked={this.state.ratingFilter}
                                                     onChange={async (e, n) => {
                                                         this.setState({
                                                             ratingFilter: n,
                                                             ratedUserPag: 0,
-                                                            setRating: n ? this.state.item.rating.filter(r => r.imageList.length !== 0) : this.state.item.rating
                                                         });
                                                         setTimeout(async () => await this.loadRated(), 100);
                                                     }}

@@ -19,6 +19,7 @@ import {GoogleOAuthProvider} from "@react-oauth/google";
 import {DevSupport} from "@react-buddy/ide-toolbox";
 import {ComponentPreviews, useInitial} from "./dev";
 import Item from "./pages/Item";
+import Settings from "./pages/Settings";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -41,6 +42,7 @@ root.render(
                             <Route path={"shop/:shopId"} element={<Shop/>}/>
                             <Route path={"login"} element={<Login/>}/>
                             <Route path={"myShop"} element={<MyShop/>}/>
+                            <Route path={"settings"} element={<Settings/>}/>
 
                             <Route path={"*"} element={<NotFound/>}/>
                             <Route path={"pp"} element={<PP/>}/>

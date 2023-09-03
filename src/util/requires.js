@@ -17,7 +17,10 @@ export default class Requires {
                     params: { ...body },
                 });
             } else {
-                res = await Axios.get(url+path, { ...header });
+                res = await Axios.get(url+path, {
+                    headers: { ...header },
+                    params: { ...body },
+                });
             }
         } catch (err) {
             res = err.response;

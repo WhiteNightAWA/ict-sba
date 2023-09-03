@@ -42,7 +42,7 @@ import Requires from "../util/requires";
 import cookie from "react-cookies";
 import {LoadingButton} from '@mui/lab';
 import mapboxgl from 'mapbox-gl/dist/mapbox-gl.js';
-
+import LOGO from "../res/img/logo.png"
 
 const SearchBar = styled('div')(({theme}) => ({
     position: 'relative',
@@ -90,7 +90,7 @@ class AppBar extends Component {
             tabs: [
                 ["BUY", <LocalMall/>, "buy"],
             ],
-            tab: "home",
+            tab: "",
             login: false,
             menu: false,
             logoutDia: false,
@@ -118,7 +118,6 @@ class AppBar extends Component {
             if (res.data.type === "sell") {
                 this.setState({
                     tabs: [
-                        ["主頁", <Home/>, "home"],
                         ["BUY", <LocalMall/>, "buy"],
                         ["My Shop", <Storefront/>, "myShop"],
                     ],
@@ -166,11 +165,11 @@ class AppBar extends Component {
                         console.log("An unknown error occurred.")
                         break;
                 }
-            
+
                 this.setState({
                     gettingLocation: false,
                 })
-            }, 
+            },
             {
                enableHighAccuracy: true,
                timeout: 5000,
@@ -224,8 +223,8 @@ class AppBar extends Component {
                 if (res.data.sell) {
                     this.setState({
                         tabs: [
+                            ...this.state.tabs,
                             ["My Shop", <Storefront/>, "shop"],
-                            ...this.state.tabs
                         ]
                     })
                 }
@@ -238,6 +237,10 @@ class AppBar extends Component {
         }
     }
 
+
+    componentDidUpdate(prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS) {
+        console.log("test");
+    }
     render() {
         return (
             <Box sx={{flexGrow: 1}}>
@@ -426,10 +429,17 @@ class AppBar extends Component {
                     <Toolbar sx={{justifyContent: "space-between"}}>
                         <Stack direction={"row"}>
                             <Toolbar>
-
-                                <Typography variant="h6" component="div">
-                                    [logo] 買D餸
-                                </Typography>
+                                <Link to={""} onClick={() => this.setState({ tab: "" })}>
+                                    <Stack direction={"row"} alignItems={"center"}>
+                                        <img src={LOGO} alt={"logo"} style={{
+                                            width: "auto",
+                                            height: "3em"
+                                        }}/>
+                                        <Typography variant="h6" component="div" color={"white"}>
+                                            買D餸
+                                        </Typography>
+                                    </Stack>
+                                </Link>
 
                                 <SearchBar>
                                     <SearchIconWrapper>
@@ -499,25 +509,14 @@ class AppBar extends Component {
                                 </Stack>
 
                                 <Divider sx={{m: "0.5em"}}/>
-
-                                <MenuItem onClick={() => this.setState({menu: false})}>
-                                    <ListItemIcon>
-                                        <Person/>
-                                    </ListItemIcon>
-                                    Profile
-                                </MenuItem>
-                                <MenuItem onClick={() => this.setState({menu: false})}>
-                                    <ListItemIcon>
-                                        <ShoppingCart/>
-                                    </ListItemIcon>
-                                    Cart
-                                </MenuItem>
-                                <MenuItem onClick={() => this.setState({menu: false})}>
-                                    <ListItemIcon>
-                                        <Settings/>
-                                    </ListItemIcon>
-                                    Setting
-                                </MenuItem>
+                                <Link to={"settings"}>
+                                    <MenuItem onClick={() => this.setState({menu: false, tab: ""})} sx={{ color: "white" }}>
+                                        <ListItemIcon>
+                                            <Settings/>
+                                        </ListItemIcon>
+                                        Setting
+                                    </MenuItem>
+                                </Link>
 
                                 <Divider sx={{m: "0.5em"}}/>
 
@@ -549,7 +548,7 @@ class AppBar extends Component {
                         </> : <Link to={"login"}>
                             <Button className={"noTD"} size={"large"} vaiant={"contained"}
                                     onClick={() => this.setState({tab: "login"})}>
-                                Login & SignUp
+                                登入/註冊
                             </Button>
                         </Link>}
 

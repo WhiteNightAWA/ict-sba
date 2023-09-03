@@ -47,7 +47,7 @@ import {
     Favorite,
     FormatListBulleted,
     KeyboardArrowRight,
-    ListAlt, MoreVert,
+    ListAlt, MoreVert, OpenInNew,
     Replay, Share, Star, Warning
 } from "@mui/icons-material";
 import {AutoPlaySwipeableViews, getValueColor, transformObject, uploader} from "../../util/functions";
@@ -85,7 +85,7 @@ export class ItemDisplay extends Component {
             searchLs: false,
             searchedSelect: [],
             Els: [],
-            display: "card",
+            display: window.localStorage.getItem("display") === "list" ? "list" : "card",
             favorite: false,
             sort: "name",
             reverse: false,
@@ -223,8 +223,6 @@ export class ItemDisplay extends Component {
         }
         await this.loadItem();
     }
-
-
 
 
     render() {
@@ -812,7 +810,7 @@ export class ItemDisplay extends Component {
                             }}
                             className={"scrollBar"}
                         >
-                            {this.state.noItem ?
+                            {(this.props.buy ? this.props.noResults : this.state.noItem ) ?
                                 <Stack sx={{width: "90%", height: "50vh"}} alignItems={"center"}
                                        justifyContent={"center"}>
                                     <Typography variant={"h1"} color={"gray"}>暫無商品</Typography>
@@ -862,8 +860,8 @@ export class ItemDisplay extends Component {
                                         <CardHeader
                                             avatar={
                                                 <Avatar
-                                                    src={this.props.buy ? this.props.shops[index]?.avatar : this.state.shop.avatar}
-                                                    alt={this.props.buy ? this.props.shops[index]?.shopName : this.state.shop.shopName}
+                                                    src={this.props.buy ? item.shopData.avatar : this.state.shop.avatar}
+                                                    alt={this.props.buy ? item.shopData.shopName : this.state.shop.shopName}
                                                     sx={{
                                                         height: 40,
                                                         width: 40
@@ -872,6 +870,9 @@ export class ItemDisplay extends Component {
                                             }
                                             action={
                                                 <>
+                                                    {this.props.buy && <IconButton size={"large"} onClick={() => window.location.hash = `/shop/${item.shopId}?itemId=${item._id}`}>
+                                                        <OpenInNew/>
+                                                    </IconButton>}
                                                     {this.state.user?.favorited?.includes(item._id) ? <IconButton
                                                         onClick={async () => await this.onFavorite(true, item._id)}
                                                     >
@@ -920,13 +921,22 @@ export class ItemDisplay extends Component {
                                                     </Menu>
                                                 </>
                                             }
-                                            title={<Typography
-                                                variant={"h5"}>{this.props.buy ? this.props.shops[index]?.shopName : this.state.shop.shopName}</Typography>}
+                                            title={<Stack direction={"row"}>
+                                                <Typography variant={"h5"}>
+                                                    {this.props.buy ? item.shopData.shopName : this.state.shop.shopName}
+                                                </Typography>
+                                                <Typography fontSize={"1.5rem"} color={"gold"}>
+                                                    {this.props.showDistance && <>
+                                                        &nbsp;- {item.distance > 1 ? item.distance.toFixed(2).toString()+"公里" : Math.round(item.distance*1000).toString()+"米"}
+                                                    </>}
+                                                </Typography>
+                                            </Stack>}
                                             subheader={<Typography
                                                 sx={{fontSize: '1rem', width: "60%"}}>
-                                                {this.props.buy ? this.props.shops[index]?.short : this.state.shop.short}
+                                                {this.props.buy ? item.shopData.short : this.state.shop.short}
                                             </Typography>}
                                         />
+
                                         {
                                             item.imageList?.length !== 0 &&
                                             <Box sx={{
@@ -1044,7 +1054,7 @@ export class ItemDisplay extends Component {
                                 mb: "1em",
                                 overflowX: "hidden"
                             }}>
-                                {this.state.noItem ?
+                                {(this.props.buy ? this.props.noResults : this.state.noItem ) ?
                                     <Stack sx={{width: "100%", height: "50vh"}}
                                            alignItems={"center"}
                                            justifyContent={"center"}>
@@ -1120,23 +1130,31 @@ export class ItemDisplay extends Component {
                                                        alignItems={"center"}
                                                 >
                                                     <Avatar
-                                                        src={this.props.buy ? this.props.shops[index]?.avatar : this.state.shop.avatar}
-                                                        alt={this.props.buy ? this.props.shops[index]?.shopName : this.state.shop.shopName}
+                                                        src={this.props.buy ? item.shopData.avatar : this.state.shop.avatar}
+                                                        alt={this.props.buy ? item.shopData.shopName : this.state.shop.shopName}
                                                         sx={{
                                                             height: 50,
                                                             width: 50
                                                         }}
                                                     />
                                                     <Stack>
-                                                        <Typography
-                                                            variant={"h5"}>{this.props.buy ? this.props.shops[index]?.shopName : this.state.shop.shopName}</Typography>
-                                                        <Typography sx={{
-                                                            fontSize: '1rem',
-                                                            width: "60%"
-                                                        }}>
-                                                            {this.props.buy ? this.props.shops[index]?.short : this.state.shop.short}
+                                                        <Typography variant={"h5"}>
+                                                            {this.props.buy ? item.shopData.shopName : this.state.shop.shopName}
                                                         </Typography>
+                                                        <Stack direction={"row"}>
+                                                            <Typography sx={{
+                                                                fontSize: '1rem',
+                                                            }}>
+                                                                {this.props.buy ? item.shopData.short : this.state.shop.short}
+                                                            </Typography>
+                                                            <Typography fontSize={"1rem"} color={"gold"}>
+                                                                {this.props.showDistance && <>
+                                                                    &nbsp;- {item.distance > 1 ? item.distance.toFixed(2).toString()+"公里" : Math.round(item.distance*1000).toString()+"米"}
+                                                                </>}
+                                                            </Typography>
+                                                        </Stack>
                                                     </Stack>
+
                                                 </Stack>
                                                 <MenuItem sx={{
                                                     width: "65%"
@@ -1185,6 +1203,9 @@ export class ItemDisplay extends Component {
                                                 <Stack width={"15%"} direction={"row"}
                                                        height={"fit-content"}
                                                        spacing={0} justifyContent={"flex-end"}>
+                                                    {this.props.buy && <IconButton size={"large"} onClick={() => window.location.hash = `/shop/${item.shopId}?itemId=${item._id}`}>
+                                                        <OpenInNew/>
+                                                    </IconButton>}
                                                     {this.state.user?.favorited?.includes(item._id) ? <IconButton
                                                         onClick={async () => await this.onFavorite(true, item._id)}
                                                     >

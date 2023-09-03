@@ -27,7 +27,17 @@ import {
     Collapse,
     ListItemButton,
     Checkbox,
-    ListItem, InputAdornment, Box, Button, FormControlLabel, Pagination
+    ListItem,
+    InputAdornment,
+    Box,
+    Button,
+    FormControlLabel,
+    Pagination,
+    Dialog,
+    DialogTitle,
+    DialogContent,
+    Snackbar,
+    Alert
 } from "@mui/material";
 import {
     ArrowRight, Dashboard,
@@ -42,6 +52,8 @@ import "../styles/Buy.css"
 import Requires from "../util/requires";
 import {ItemDisplay} from "../components/shop/ItemDisplay";
 import {transformObject} from "../util/functions";
+import mapboxgl from "mapbox-gl";
+import {LoadingButton} from "@mui/lab";
 
 class Buy extends Component {
     constructor(props) {
@@ -57,15 +69,23 @@ class Buy extends Component {
 
             items: [],
             shops: [],
+            position: [],
 
             category: {},
             Els: [],
-            display: "card",
+            display: window.localStorage.getItem("display") === "list" ? "list": "card",
             searchable: false,
             noResults: false,
 
             pag: 0,
             count: 0,
+
+            positionDl: false,
+
+            // sb
+            sb: false,
+            sbS: "",
+            sbMsg: "",
         };
     }
 
@@ -106,7 +126,68 @@ class Buy extends Component {
                 user: user.data,
             })
         }
-        await this.loadItem()
+        let allow = window.localStorage.getItem("allowLocation");
+        console.log(allow);
+        if (allow === null) {
+            this.setState({ positionDl: true, })
+        } else if (allow === "true") {
+            await this.getLocation();
+        } else {
+            await this.loadItem()
+        }
+    }
+    async getLocation() {
+        let positions;
+        if ("geolocation" in navigator) {
+            window.localStorage.setItem("allowLocation", "true");
+            this.setState({
+                gettingLocation: true
+            });
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                    positions = [position.coords.latitude, position.coords.longitude]
+
+                    console.log(positions)
+                    this.setState({
+                        gettingLocation: false,
+                        position: positions,
+                        positionDl: false,
+                        sort: "distance",
+                    });
+                    setTimeout(async () => await this.loadItem(), 100);
+                }, async (error) => {
+                    let msg;
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            msg = "User denied the request for Geolocation.";
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            msg = "Location information is unavailable.";
+                            break;
+                        case error.TIMEOUT:
+                            msg = "The request to get user location timed out.";
+                            break;
+                        case error.UNKNOWN_ERROR:
+                            msg = "An unknown error occurred.";
+                            break;
+                    }
+
+                    this.setState({
+                        gettingLocation: false,
+                        sb: true,
+                        sbS: "error",
+                        sbMsg: msg,
+                        positionDl: false,
+                    });
+                    await this.loadItem();
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                });
+        } else {
+            positions = [-1, -1]
+        }
     }
 
     loadItem = async () => {
@@ -118,19 +199,7 @@ class Buy extends Component {
         items = items ? items : [];
         this.setState({
             items: items,
-        });
-
-        items.map(async (item, index) => {
-            await Requires.get("/shops/get/" + item.shopId).then((shop) => {
-                console.log(shop);
-                if (shop.status === 200) {
-                    let shops = this.state.shops;
-                    shops.push(shop.data);
-                    this.setState({
-                        shops: shops
-                    })
-                }
-            });
+            noResults: items.length === 0
         });
     }
 
@@ -142,7 +211,8 @@ class Buy extends Component {
             un: this.state.un,
             favorited: this.state.user && this.state.favorite ? JSON.stringify(this.state.user.favorited) : "[]",
             noSave: this.state.noSave,
-            page: this.state.pag
+            page: this.state.pag,
+            position: JSON.stringify(this.state.position),
         });
         this.setState({ count: items.data.count })
         if (items.status === 200) {
@@ -152,6 +222,16 @@ class Buy extends Component {
 
     render() {
         return <Stack alignItems={"center"} width={"calc(100% - 6em)"} p={"3em"} pt={0}>
+            <Snackbar anchorOrigin={{horizontal: "right", vertical: "bottom"}}
+                      open={this.state.sb} autoHideDuration={10000}
+                      onClose={() => this.setState({sb: false})}
+            >
+                <Alert onClose={() => this.setState({sb: false})}
+                       severity={this.state.sbS}
+                       sx={{width: '100%'}}>
+                    {this.state.sbMsg}
+                </Alert>
+            </Snackbar>
             <Paper sx={{
                 width: "90%",
                 bgColor: "rgba(255,255,255,0.01)",
@@ -159,6 +239,50 @@ class Buy extends Component {
                 zIndex: 99,
                 mt: "3em"
             }} elevation={12}>
+
+                <Dialog open={this.state.positionDl} maxWidth={"md"} fullWidth>
+                    <DialogTitle>
+                        <Typography variant={"h3"}>
+                            請允許使用來獲取您當前的位置
+                        </Typography>
+                    </DialogTitle>
+                    <DialogContent>
+                        <Stack alignItems={"center"}>
+                            <Typography variant={"h6"} color={"lightgray"} textAlign={"center"}>
+                                尋找最近的店舖時，我們需要知道您的目前位置。請按下面的按鈕，允許我們自動獲取您的位置資訊。
+                            </Typography>
+                            <LoadingButton loading={this.state.gettingLocation} variant={"outlined"} onClick={async (e) => {
+                                this.setState({ gettingLocation: true })
+                                await this.getLocation();
+                            }}>
+                                <Typography variant={"h4"}>
+                                    獲取我的位置
+                                </Typography>
+                            </LoadingButton>
+                            <Typography variant={"h6"} color={"lightgray"} textAlign={"center"}>
+                                請放心，我們尊重您的隱私，我們只會使用您的位置資訊來尋找最近的店舖。您的位置資料不會被儲存或與任何第三方分享。
+                                <br/>
+                                通過提供您的目前位置，我們可以為您提供有關附近店舖的準確且相關的資訊，包括距離和路線。這將大大提升您的購物體驗，幫助您更輕鬆地找到您需要的物品。
+                                <br/>
+                                感謝您允許我們獲取您的位置！如果您對於隱私或位置資料的使用有任何疑慮或問題，請隨時聯繫我們的支援團隊。祝您購物愉快！
+                            </Typography>
+                            <Button onClick={async () => {
+                                this.setState({positionDl: false, sort: "name"});
+                                await this.loadItem();
+                            }}>
+                                拒絕
+                            </Button>
+                            <Button color={"error"} onClick={async () => {
+                                window.localStorage.setItem("allowLocation", false)
+                                this.setState({positionDl: false, sort: "name"});
+                                await this.loadItem();
+                            }}>
+                                不要再次詢問
+                            </Button>
+                        </Stack>
+                    </DialogContent>
+                </Dialog>
+
                 <Stack width={"100%"} alignItems={"center"}>
                     <Stack direction={"row"} width={"100%"}>
                         <TextField
@@ -256,6 +380,9 @@ class Buy extends Component {
                                         onChange={(e) => this.setState({sort: e.target.value})}
                                     >
                                         <MenuItem value={"name"}>名稱</MenuItem>
+                                        <MenuItem value={"distance"} onClick={(e) => {
+                                            this.state.position.length === 0 && this.setState({ positionDl: true })
+                                        }}>距離</MenuItem>
                                         <MenuItem value={"price"}>價格</MenuItem>
                                         <MenuItem value={"fresh"}>新鮮</MenuItem>
                                     </Select>
@@ -627,10 +754,12 @@ class Buy extends Component {
                 <ItemDisplay
                     owner={false}
                     buy={true}
-                    shops={this.state.shops}
                     display={this.state.display}
                     loadItems={this.loadItem}
+                    showDistance={this.state.sort === "distance"}
                     items={this.state.items}
+                    noResults={this.state.noResults}
+
                     showItem={this.state.showItem}
                     clean={() => this.setState({showItem: null})}
                 />

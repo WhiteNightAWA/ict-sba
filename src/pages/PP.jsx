@@ -6,7 +6,9 @@ class PP extends Component {
     render() {
         return (
             <Container sx={{
-                p: 5
+                p: 5,
+                height: "90vh",
+                overflowY: "auto",
             }}>
                 <h1>Privacy Policy</h1>
                 <p>Last updated: May 13, 2023</p>
