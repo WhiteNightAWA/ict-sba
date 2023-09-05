@@ -1,15 +1,40 @@
 import React, {Component} from "react";
 import {
-    Accordion, AccordionDetails, AccordionSummary, Alert, Avatar,
+    Accordion,
+    AccordionDetails,
+    AccordionSummary,
+    Alert,
+    Avatar,
     Box,
     Button,
-    Card, CardActionArea,
+    Card,
+    CardActionArea,
     CardHeader,
-    CardMedia, Dialog, DialogActions,
+    CardMedia,
+    Dialog,
+    DialogActions,
     DialogContent,
-    DialogTitle, Divider, ImageList, ImageListItem, List, ListItem, Menu, MenuItem, Snackbar,
-    Stack, TextField,
-    Typography, Rating, Checkbox, Tooltip, FormControlLabel, CardContent, CircularProgress,
+    DialogTitle,
+    Divider,
+    ImageList,
+    ImageListItem,
+    List,
+    ListItem,
+    Menu,
+    MenuItem,
+    Snackbar,
+    Stack,
+    TextField,
+    Typography,
+    Rating,
+    Checkbox,
+    Tooltip,
+    FormControlLabel,
+    CardContent,
+    CircularProgress,
+    Backdrop,
+    IconButton,
+    Pagination as Paginations,
 } from "@mui/material";
 import {AutoPlaySwipeableViews, getValueColor, uploader, colors} from "../util/functions";
 import Pagination from "../components/Pagination";
@@ -17,7 +42,7 @@ import {
     ArrowRight, Check, Delete, Edit,
     ExpandMore,
     Favorite,
-    Share, Star, Visibility, VisibilityOff, Warning, Add, Help, ArrowLeft, ChevronLeft, ChevronRight
+    Share, Star, Visibility, VisibilityOff, Warning, Add, Help, ArrowLeft, ChevronLeft, ChevronRight, Close
 } from "@mui/icons-material";
 import {UploadDropzone, UploadButton} from "react-uploader";
 import Requires from "../util/requires";
@@ -44,6 +69,7 @@ export default class Item extends Component {
             deleteCountDown: 5,
 
             pag: 0,
+            showImagesPag: 0,
 
             addingRate: false,
             addingRateImgs: [],
@@ -115,6 +141,51 @@ export default class Item extends Component {
                 <Button onClick={this.props.close}>Back</Button>
             </Stack>
         </DialogContent> : <>
+
+            <Backdrop
+                open={this.state.showImagesPag !== 0}
+                sx={{zIndex: 999}}
+            >
+                <IconButton
+                    size={"large"}
+                    onClick={(e) => this.setState({showImagesPag: 0})}
+                    sx={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        "*": {
+
+                            fontSize: "5rem"
+                        }
+                    }}
+                >
+                    <Close />
+                </IconButton>
+                <SwipeableViews index={this.state.showImagesPag}>
+                    {this.state.item.imageList.map((url, index) => {
+                        return <Stack height={"100%"} justifyContent={"center"}>
+                            <img src={url} alt={url} style={{
+                                width: "100%"
+                            }}/>
+                        </Stack>
+                    })}
+                </SwipeableViews>
+                <Paginations
+                    sx={{
+                        position: "absolute",
+                        bottom: "2em",
+                        backdropFilter: "blur(4px)",
+                        background: "rgba(0,0,0,0.25)",
+                        p: 2,
+                    }}
+                    count={this.state.item.imageList.length}
+                    size={"large"}
+                    variant={"text"}
+                    shape={"rounded"}
+                    onChange={(e, n) => this.setState({ showImagesPag: n })}
+                />
+            </Backdrop>
+
             <Snackbar anchorOrigin={{horizontal: "right", vertical: "bottom"}}
                       open={this.state.needLoginSb} autoHideDuration={10000}
                       onClose={() => this.setState({needLoginSb: false})}
@@ -128,7 +199,13 @@ export default class Item extends Component {
             {
                 this.state.item.imageList?.length !== 0 && <Box sx={{
                     position: 'relative',
-                    filter: "drop-shadow(2px 4px 6px black)"
+                    filter: "drop-shadow(2px 4px 6px black)",
+                    transition: "filter 0.5s, transform 0.5s",
+                    cursor: "pointer",
+                    "&:hover": {
+                        filter: "drop-shadow(2px 4px 6px black) brightness(0.5)",
+                        transform: "scale(1.125)",
+                    }
                 }}>
                     <AutoPlaySwipeableViews
                         index={this.state.pag}
@@ -139,7 +216,7 @@ export default class Item extends Component {
                                 return (
                                     <CardMedia
                                         key={index}
-                                        sx={{height: 600}}
+                                        sx={{height: 200}}
                                         image={url}
                                         title={url}
                                     />)

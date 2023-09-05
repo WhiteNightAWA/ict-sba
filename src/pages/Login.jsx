@@ -125,7 +125,6 @@ class Login extends Component {
         }
     };
     google = async (data, tokenResponse) => {
-        console.log(data);
         this.setState({
             page: this.state.state,
             google: tokenResponse,
@@ -137,8 +136,8 @@ class Login extends Component {
             registering: true,
         });
 
-        const res = await Requires.post("/auth/login", {
-            google: this.state.google
+        const res = await Requires.post("/auth/google", {
+            google: this.state.google,
         });
 
         if (res.status === 200) {
@@ -152,32 +151,6 @@ class Login extends Component {
                 registering: false,
                 sb: true, sbS: "error", sbMsg: res.data.error_description,
                 page: "normal", google: {}, googleData: {}
-            });
-        }
-    }
-    googleSignup = async () => {
-        this.setState({
-            registering: true,
-        });
-
-        const res = await Requires.post("/auth/register", {
-            google: this.state.google
-        });
-
-        if (res.status === 200) {
-            this.setState({
-                registering: false,
-                page: "normal",
-                sb: true, sbS: "success", sbMsg: res.data.msg + "logging in...",
-                state: "login"
-            });
-            await this.googleLogin();
-        } else {
-            this.setState({
-                registering: false,
-                sb: true, sbS: "error", sbMsg: res.data.error_description,
-                page: "normal",
-                google: {}, googleData: {}
             });
         }
     }
@@ -388,7 +361,7 @@ class Login extends Component {
                                         email: {this.state.googleData.email}
                                     </Typography>
                                     <Typography variant={"h5"}>
-                                        Are you sure using this account to {this.state.page}?
+                                        Are you sure using this account to contiune?
                                     </Typography>
                                     <Typography color={"grey"}>
                                         By clicking the "CONFIRM" button
@@ -414,7 +387,7 @@ class Login extends Component {
                                         color={"success"}
                                         variant={"contained"}
                                         size={"large"}
-                                        onClick={() => this.state.page === "login" ? this.googleLogin() : this.googleSignup()}
+                                        onClick={this.googleLogin}
                                     >
                                         Confirm
                                     </LoadingButton>

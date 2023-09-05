@@ -46,7 +46,7 @@ import {
     KeyboardDoubleArrowRight,
     ListAlt,
     MoreVert, Replay, Search,
-    Share
+    Share, Sort
 } from "@mui/icons-material";
 import "../styles/Buy.css"
 import Requires from "../util/requires";
@@ -209,7 +209,7 @@ class Buy extends Component {
             selectedCategory: JSON.stringify(this.state.searchedSelect),
             sortBy: this.state.sort,
             un: this.state.un,
-            favorited: this.state.user && this.state.favorite ? JSON.stringify(this.state.user.favorited) : "[]",
+            favorited: this.state.user && this.state.favorite ? this.state.user.user_id : "None",
             noSave: this.state.noSave,
             page: this.state.pag,
             position: JSON.stringify(this.state.position),
@@ -389,14 +389,17 @@ class Buy extends Component {
                                 </FormControl>
 
                                 <IconButton
-                                    onClick={(e) => this.setState({un: !this.state.un})}
+                                    onClick={(e) => this.setState({reverse: !this.state.reverse})}
                                     sx={{
-                                        rotate: this.state.un ? "180deg" : "0deg",
-                                        transition: "rotate 1s",
                                         width: "2em",
                                     }}
                                 >
-                                    <ExpandMore/>
+                                    <Sort
+                                        sx={{
+                                            transform: this.state.reverse ? "rotateX(180deg)" : "rotateX(0deg)",
+                                            transition: "transform 1s",
+                                        }}
+                                    />
                                 </IconButton>
                             </Stack>
 

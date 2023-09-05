@@ -4,7 +4,7 @@ import react from "react";
 import {
     ThemeProvider,
     Paper,
-    createTheme
+    createTheme, Dialog, DialogTitle, DialogContent, Typography
 } from "@mui/material";
 import {Outlet} from "react-router-dom";
 import AppBar from "./components/AppBar";
@@ -23,7 +23,6 @@ class App extends react.Component {
         }
 
         this.state = {
-            tab: "home",
             darkMode: {
                 mode: darkMode,
                 theme: createTheme({
@@ -31,13 +30,38 @@ class App extends react.Component {
                         mode: darkMode,
                     },
                 })
-            }
+            },
+            showUpdate: window.localStorage.getItem("lastVersion") !== "1.0.1",
         }
+    }
+
+    componentDidMount() {
+        window.localStorage.setItem("lastVersion", "1.0.1")
     }
 
     render() {
         return (
             <ThemeProvider theme={this.state.darkMode.theme} className={"test"}>
+                <Dialog maxWidth={"md"} open={this.state.showUpdate} onClose={() => this.setState({ showUpdate: false })}>
+                    <DialogTitle>
+                        <Typography variant={"h3"}>
+                            V1.0.1 - Update notes
+                        </Typography>
+                    </DialogTitle>
+                    <DialogContent>
+                        <Typography variant={"h6"}>
+                            ~ Merge Google Login & Signup <br/>
+                            ~ Now same email (gmail) can register both email and google account. <br/>
+                            ~ Fixed "favorite" function <br/>
+                            ~ Fixed Login Password bugs <br/>
+                            + Add image zoom function <br/>
+                            ~ update the reverse order button make it easier to understand
+                        </Typography>
+                        <Typography color={"gray"}>
+                            *Thank you for all your testing and responses btw .w.
+                        </Typography>
+                    </DialogContent>
+                </Dialog>
                 <Paper style={{minHeight: "100vh", height: "100%", borderRadius: 0}}>
                     <AppBar />
                     <Outlet changePage={this.changePage}/>

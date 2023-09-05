@@ -28,7 +28,7 @@ function GoogleLoginButton(props) {
 				/>
 				<CardContent sx={{pl: 0}}>
 					<Typography sx={{fontSize: "1.25em"}}>
-						{props.state === "login" ? "Login " : "SignUp "} with Google
+						Contiune with Google
 					</Typography>
 				</CardContent>
 			</CardActionArea>

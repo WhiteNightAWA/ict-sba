@@ -1,7 +1,7 @@
 import {
     Alert,
     Autocomplete,
-    Avatar,
+    Avatar, Backdrop,
     Box,
     Button,
     Card,
@@ -38,17 +38,18 @@ import {
     ToggleButton,
     ToggleButtonGroup,
     Tooltip,
-    Typography
+    Typography,
+    Pagination as Paginations
 } from "@mui/material";
 import {
-    Check,
+    Check, Close,
     Dashboard,
     ExpandMore,
     Favorite,
-    FormatListBulleted,
+    FormatListBulleted, Image,
     KeyboardArrowRight,
     ListAlt, MoreVert, OpenInNew,
-    Replay, Share, Star, Warning
+    Replay, Share, Sort, Star, Warning,
 } from "@mui/icons-material";
 import {AutoPlaySwipeableViews, getValueColor, transformObject, uploader} from "../../util/functions";
 import Pagination from "../Pagination";
@@ -58,6 +59,7 @@ import Requires from "../../util/requires";
 import React, {Component} from "react";
 import {UploadDropzone} from "react-uploader";
 import {Rating} from "@mui/lab";
+import SwipeableViews from "react-swipeable-views";
 
 export class ItemDisplay extends Component {
     constructor(props) {
@@ -79,6 +81,8 @@ export class ItemDisplay extends Component {
             pag: [],
             noItem: false,
             selectedItem: null,
+            showImages: [],
+            showImagesPag: 0,
 
             // filter
             search: "",
@@ -227,6 +231,49 @@ export class ItemDisplay extends Component {
 
     render() {
         return <>
+            <Backdrop
+                open={this.state.showImages.length !== 0}
+                sx={{zIndex: 999}}
+            >
+                <IconButton
+                    size={"large"}
+                    onClick={(e) => this.setState({showImages: [], showImagesPag: 0})}
+                    sx={{
+                        position: "absolute",
+                        top: 0,
+                        right: 0,
+                        "*": {
+
+                            fontSize: "5rem"
+                        }
+                    }}
+                >
+                    <Close />
+                </IconButton>
+                <SwipeableViews index={this.state.showImagesPag}>
+                    {this.state.showImages.map((url, index) => {
+                        return <Stack height={"100%"} justifyContent={"center"}>
+                            <img src={url} alt={url} style={{
+                                width: "100%"
+                            }}/>
+                        </Stack>
+                    })}
+                </SwipeableViews>
+                <Paginations
+                    sx={{
+                        position: "absolute",
+                        bottom: "2em",
+                        backdropFilter: "blur(4px)",
+                        background: "rgba(0,0,0,0.25)",
+                        p: 2,
+                    }}
+                    count={this.state.showImages.length}
+                    size={"large"}
+                    variant={"text"}
+                    shape={"rounded"}
+                    onChange={(e, n) => this.setState({ showImagesPag: n-1 })}
+                />
+            </Backdrop>
             <Dialog
                 open={this.state.reportDl}
                 maxWidth={"md"}
@@ -427,12 +474,15 @@ export class ItemDisplay extends Component {
                                 <IconButton
                                     onClick={(e) => this.setState({reverse: !this.state.reverse})}
                                     sx={{
-                                        rotate: this.state.reverse ? "180deg" : "0deg",
-                                        transition: "rotate 1s",
                                         width: "2em",
                                     }}
                                 >
-                                    <ExpandMore/>
+                                    <Sort
+                                        sx={{
+                                            transform: this.state.reverse ? "rotateX(180deg)" : "rotateX(0deg)",
+                                            transition: "transform 1s",
+                                        }}
+                                    />
                                 </IconButton>
                             </Stack>
 
@@ -587,7 +637,8 @@ export class ItemDisplay extends Component {
                                 </List>
                             }
                             <Divider orientation="vertical" flexItem/>
-                            {this.state.Els[1] !== undefined &&
+                            {
+                                this.state.Els[1] !== undefined &&
                                 <List
                                     sx={isNaN(Object.keys(this.state.category[this.state.Els[0]][this.state.Els[1]])[0]) ? {
                                         width: "17%",
@@ -810,7 +861,7 @@ export class ItemDisplay extends Component {
                             }}
                             className={"scrollBar"}
                         >
-                            {(this.props.buy ? this.props.noResults : this.state.noItem ) ?
+                            {(this.props.buy ? this.props.noResults : this.state.noItem) ?
                                 <Stack sx={{width: "90%", height: "50vh"}} alignItems={"center"}
                                        justifyContent={"center"}>
                                     <Typography variant={"h1"} color={"gray"}>暫無商品</Typography>
@@ -870,7 +921,8 @@ export class ItemDisplay extends Component {
                                             }
                                             action={
                                                 <>
-                                                    {this.props.buy && <IconButton size={"large"} onClick={() => window.location.hash = `/shop/${item.shopId}?itemId=${item._id}`}>
+                                                    {this.props.buy && <IconButton size={"large"}
+                                                                                   onClick={() => window.location.hash = `/shop/${item.shopId}?itemId=${item._id}`}>
                                                         <OpenInNew/>
                                                     </IconButton>}
                                                     {this.state.user?.favorited?.includes(item._id) ? <IconButton
@@ -927,7 +979,7 @@ export class ItemDisplay extends Component {
                                                 </Typography>
                                                 <Typography fontSize={"1.5rem"} color={"gold"}>
                                                     {this.props.showDistance && <>
-                                                        &nbsp;- {item.distance > 1 ? item.distance.toFixed(2).toString()+"公里" : Math.round(item.distance*1000).toString()+"米"}
+                                                        &nbsp;- {item.distance > 1 ? item.distance.toFixed(2).toString() + "公里" : Math.round(item.distance * 1000).toString() + "米"}
                                                     </>}
                                                 </Typography>
                                             </Stack>}
@@ -939,10 +991,19 @@ export class ItemDisplay extends Component {
 
                                         {
                                             item.imageList?.length !== 0 &&
-                                            <Box sx={{
-                                                position: 'relative',
-                                                filter: "drop-shadow(2px 4px 6px black)"
-                                            }}>
+                                            <Box
+                                                sx={{
+                                                    position: 'relative',
+                                                    filter: "drop-shadow(2px 4px 6px black)",
+                                                    transition: "filter 0.5s, transform 0.5s",
+                                                    cursor: "pointer",
+                                                    "&:hover": {
+                                                        filter: "drop-shadow(2px 4px 6px black) brightness(0.5)",
+                                                        transform: "scale(1.125)",
+                                                    }
+                                                }}
+                                                onClick={(e) => this.setState({showImages: item.imageList})}
+                                            >
                                                 <AutoPlaySwipeableViews
                                                     index={this.state.pag[index]}
                                                     onChangeIndex={(i) => {
@@ -1054,7 +1115,7 @@ export class ItemDisplay extends Component {
                                 mb: "1em",
                                 overflowX: "hidden"
                             }}>
-                                {(this.props.buy ? this.props.noResults : this.state.noItem ) ?
+                                {(this.props.buy ? this.props.noResults : this.state.noItem) ?
                                     <Stack sx={{width: "100%", height: "50vh"}}
                                            alignItems={"center"}
                                            justifyContent={"center"}>
@@ -1149,7 +1210,7 @@ export class ItemDisplay extends Component {
                                                             </Typography>
                                                             <Typography fontSize={"1rem"} color={"gold"}>
                                                                 {this.props.showDistance && <>
-                                                                    &nbsp;- {item.distance > 1 ? item.distance.toFixed(2).toString()+"公里" : Math.round(item.distance*1000).toString()+"米"}
+                                                                    &nbsp;- {item.distance > 1 ? item.distance.toFixed(2).toString() + "公里" : Math.round(item.distance * 1000).toString() + "米"}
                                                                 </>}
                                                             </Typography>
                                                         </Stack>
@@ -1203,7 +1264,8 @@ export class ItemDisplay extends Component {
                                                 <Stack width={"15%"} direction={"row"}
                                                        height={"fit-content"}
                                                        spacing={0} justifyContent={"flex-end"}>
-                                                    {this.props.buy && <IconButton size={"large"} onClick={() => window.location.hash = `/shop/${item.shopId}?itemId=${item._id}`}>
+                                                    {this.props.buy && <IconButton size={"large"}
+                                                                                   onClick={() => window.location.hash = `/shop/${item.shopId}?itemId=${item._id}`}>
                                                         <OpenInNew/>
                                                     </IconButton>}
                                                     {this.state.user?.favorited?.includes(item._id) ? <IconButton
