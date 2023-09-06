@@ -34,7 +34,7 @@ import {
 } from "@mui/material";
 import {
     Home, LocalMall, Logout, Search,
-    ShoppingCart, Settings, Person, ShoppingBasket, Storefront, Check, LocationOn
+    ShoppingCart, Settings, Person, ShoppingBasket, Storefront, Check, LocationOn, ArrowBack, ArrowBackIosNew
 } from "@mui/icons-material";
 import TabsLink from "./TabsLink";
 import {Link} from "react-router-dom";
@@ -108,6 +108,8 @@ class AppBar extends Component {
             sb: false,
             sbS: "",
             sbMsg: "",
+
+            open: true,
         }
     }
 
@@ -125,8 +127,6 @@ class AppBar extends Component {
                 })
             }
         }
-
-        
     }
 
     async logout() {
@@ -151,34 +151,35 @@ class AppBar extends Component {
                         address: this.state.address ? this.state.address : positions.toString(),
                     });
                 }, (error) => {
-                switch(error.code) {
-                    case error.PERMISSION_DENIED:
-                        console.log("User denied the request for Geolocation.")
-                        break;
-                    case error.POSITION_UNAVAILABLE:
-                        console.log("Location information is unavailable.")
-                        break;
-                    case error.TIMEOUT:
-                        console.log("The request to get user location timed out.")
-                        break;
-                    case error.UNKNOWN_ERROR:
-                        console.log("An unknown error occurred.")
-                        break;
-                }
+                    switch (error.code) {
+                        case error.PERMISSION_DENIED:
+                            console.log("User denied the request for Geolocation.")
+                            break;
+                        case error.POSITION_UNAVAILABLE:
+                            console.log("Location information is unavailable.")
+                            break;
+                        case error.TIMEOUT:
+                            console.log("The request to get user location timed out.")
+                            break;
+                        case error.UNKNOWN_ERROR:
+                            console.log("An unknown error occurred.")
+                            break;
+                    }
 
-                this.setState({
-                    gettingLocation: false,
-                })
-            },
-            {
-               enableHighAccuracy: true,
-               timeout: 5000,
-               maximumAge: 0
-            });
+                    this.setState({
+                        gettingLocation: false,
+                    })
+                },
+                {
+                    enableHighAccuracy: true,
+                    timeout: 5000,
+                    maximumAge: 0
+                });
         } else {
             positions = [-1, -1]
         }
     }
+
     checkHKID(idno) { // Check vat code
         var alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
         let i, a, d, sum = 0, s = "";
@@ -208,7 +209,8 @@ class AppBar extends Component {
             return d;
         }
     }
-    async done () {
+
+    async done() {
         if (!(this.state.settingVal === "sell" && !(this.state.fn && this.state.ln && String(this.checkHKID(this.state.HKID)) === this.state.vat.toString() && this.state.shopName && !this.state.position.includes(-1)))) {
             this.setState({doneing: true});
             const res = await Requires.post("/users/done", {
@@ -238,12 +240,9 @@ class AppBar extends Component {
     }
 
 
-    componentDidUpdate(prevProps: Readonly<P>, prevState: Readonly<S>, snapshot: SS) {
-        console.log("test");
-    }
     render() {
         return (
-            <Box sx={{flexGrow: 1}}>
+            <Stack alignItems={"flex-end"} sx={{flexGrow: 1}}>
                 <Snackbar anchorOrigin={{horizontal: "right", vertical: "bottom"}}
                           open={this.state.sb} autoHideDuration={10000}
                           onClose={() => this.setState({sb: false})}>
@@ -324,7 +323,8 @@ class AppBar extends Component {
                                                         width: "14em"
                                                     }}
                                                     endAdornment={<InputAdornment position="end">
-                                                        <Typography color={String(this.checkHKID(this.state.HKID)) !== this.state.vat.toString() ? "error" : "white"}>(</Typography>
+                                                        <Typography
+                                                            color={String(this.checkHKID(this.state.HKID)) !== this.state.vat.toString() ? "error" : "white"}>(</Typography>
                                                         <InputBase
                                                             sx={{
                                                                 width: "1em",
@@ -334,7 +334,8 @@ class AppBar extends Component {
                                                             }}
                                                             onChange={(e) => this.setState({vat: e.target.value})}
                                                         />
-                                                        <Typography color={String(this.checkHKID(this.state.HKID)) !== this.state.vat.toString() ? "error" : "white"}>)</Typography>
+                                                        <Typography
+                                                            color={String(this.checkHKID(this.state.HKID)) !== this.state.vat.toString() ? "error" : "white"}>)</Typography>
                                                     </InputAdornment>}
                                                 />
                                             </FormControl>
@@ -346,47 +347,48 @@ class AppBar extends Component {
                                             />
                                         </Stack>
                                         <Stack direction={"row"} spacing={2}>
-                                            
-                                    
-                                        <TextField
-                                            variant={"outlined"}
-                                            type={"number"}
-                                            sx={{
-                                                width: "14em"
-                                            }}
-                                            error={this.state.phone > 99999999 || this.state.phone < 10000000}
-                                            placeholder={"Phone Number"}
-                                            value={this.state.phone}
-                                            onChange={(e) => this.setState({
-                                                phone: e.target.value,
-                                            })}
-                                            disabled={this.state.loading}
-                                            InputProps={{
-                                                startAdornment: <InputAdornment position="start">+852 </InputAdornment>,
-                                            }}
-                                        />
-                                        { this.state.position.includes(-1) ?
-                                            <LoadingButton loading={this.state.gettingLocation}
-                                                            sx={{
-                                                                width: "16em"
-                                                            }}
-                                                           onClick={async () => await this.getLocation()}>
-                                                Get my location
-                                            </LoadingButton> :
-                                            <Typography
-                                            sx={{
-                                                width: "14em"
-                                            }}
-                                            color={"grey"} display={"flex"} flexDirection={"column"}
-                                                        alignItems={"center"}>
-                                                <Check color={"success"}/>
-                                                {this.state.position.toString()}
-                                            </Typography>}
+
+
+                                            <TextField
+                                                variant={"outlined"}
+                                                type={"number"}
+                                                sx={{
+                                                    width: "14em"
+                                                }}
+                                                error={this.state.phone > 99999999 || this.state.phone < 10000000}
+                                                placeholder={"Phone Number"}
+                                                value={this.state.phone}
+                                                onChange={(e) => this.setState({
+                                                    phone: e.target.value,
+                                                })}
+                                                disabled={this.state.loading}
+                                                InputProps={{
+                                                    startAdornment: <InputAdornment
+                                                        position="start">+852 </InputAdornment>,
+                                                }}
+                                            />
+                                            {this.state.position.includes(-1) ?
+                                                <LoadingButton loading={this.state.gettingLocation}
+                                                               sx={{
+                                                                   width: "16em"
+                                                               }}
+                                                               onClick={async () => await this.getLocation()}>
+                                                    Get my location
+                                                </LoadingButton> :
+                                                <Typography
+                                                    sx={{
+                                                        width: "14em"
+                                                    }}
+                                                    color={"grey"} display={"flex"} flexDirection={"column"}
+                                                    alignItems={"center"}>
+                                                    <Check color={"success"}/>
+                                                    {this.state.position.toString()}
+                                                </Typography>}
                                         </Stack>
                                         <TextField
                                             variant={"outlined"}
                                             value={this.state.address}
-                                            onChange={(e) => this.setState({ address: e.target.value })}
+                                            onChange={(e) => this.setState({address: e.target.value})}
                                             multiline
                                             fullWidth
 
@@ -425,136 +427,155 @@ class AppBar extends Component {
                         </LoadingButton>
                     </DialogActions>
                 </Dialog>
-                <ABar position="static">
-                    <Toolbar sx={{justifyContent: "space-between"}}>
-                        <Stack direction={"row"}>
-                            <Toolbar>
-                                <Link to={""} onClick={() => this.setState({ tab: "" })}>
-                                    <Stack direction={"row"} alignItems={"center"}>
-                                        <img src={LOGO} alt={"logo"} style={{
-                                            width: "auto",
-                                            height: "3em"
+                <Collapse in={this.state.open} sx={{ width: "100%" }}>
+
+                    <ABar position="static">
+                        <Toolbar sx={{justifyContent: "space-between"}}>
+                            <Stack direction={"row"}>
+                                <Toolbar>
+                                    <Link to={""} onClick={() => this.setState({tab: ""})}>
+                                        <Stack direction={"row"} alignItems={"center"}>
+                                            <img src={LOGO} alt={"logo"} style={{
+                                                width: "auto",
+                                                height: "3em"
+                                            }}/>
+                                            <Typography variant="h6" component="div" color={"white"}>
+                                                買D餸
+                                            </Typography>
+                                        </Stack>
+                                    </Link>
+
+                                    <SearchBar>
+                                        <SearchIconWrapper>
+                                            <Search/>
+                                        </SearchIconWrapper>
+                                        <StyledInputBase
+                                            placeholder="Search…"
+                                            inputProps={{'aria-label': 'search'}}
+                                        />
+                                    </SearchBar>
+                                </Toolbar>
+
+                                <Tabs
+                                    value={this.state.tab}
+                                    onChange={(e, n) => this.setState({tab: n})}
+                                    aria-label="page tabs"
+                                >
+
+                                    {
+                                        this.state.tabs.map((data, index) => {
+                                            return <TabsLink sx={{
+                                                width: "8em"
+                                            }} label={data[0]} key={data[0]} icon={data[1]} value={data[2]} wrapped/>
+                                        })
+                                    }
+                                </Tabs>
+                            </Stack>
+
+                            {this.state.login ? <>
+                                <IconButton sx={{p: 0}} onClick={() => this.setState({menu: true})}>
+                                    <Avatar alt={this.state.data.username} src={this.state.data.photoURL}/>
+                                </IconButton>
+                                <Menu
+                                    id="menu-appbar"
+                                    anchorOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    keepMounted
+                                    transformOrigin={{
+                                        vertical: 'top',
+                                        horizontal: 'right',
+                                    }}
+                                    open={this.state.menu}
+                                    onClose={() => this.setState({menu: false})}
+                                    sx={{
+                                        pt: "0"
+                                    }}
+                                >
+                                    <Stack direction={"row"} alignItems={"flex-end"} sx={{
+                                        m: "1em",
+                                        height: "5em",
+                                        width: "100%"
+                                    }} spacing={3}>
+                                        <Stack>
+                                            <Typography color={"grey"}>
+                                                Welcome,
+                                            </Typography>
+                                            <Typography variant={this.state.data.username.length > 8 ? "h3" : "h2"}>
+                                                {this.state.data.username}
+                                            </Typography>
+                                        </Stack>
+                                        <Avatar alt={this.state.data.username} src={this.state.data.photoURL} sx={{
+                                            height: "4em",
+                                            width: "4em"
                                         }}/>
-                                        <Typography variant="h6" component="div" color={"white"}>
-                                            買D餸
-                                        </Typography>
                                     </Stack>
-                                </Link>
 
-                                <SearchBar>
-                                    <SearchIconWrapper>
-                                        <Search/>
-                                    </SearchIconWrapper>
-                                    <StyledInputBase
-                                        placeholder="Search…"
-                                        inputProps={{'aria-label': 'search'}}
-                                    />
-                                </SearchBar>
-                            </Toolbar>
+                                    <Divider sx={{m: "0.5em"}}/>
+                                    <Link to={"settings"}>
+                                        <MenuItem onClick={() => this.setState({menu: false, tab: ""})}
+                                                  sx={{color: "white"}}>
+                                            <ListItemIcon>
+                                                <Settings/>
+                                            </ListItemIcon>
+                                            Setting
+                                        </MenuItem>
+                                    </Link>
 
-                            <Tabs
-                                value={this.state.tab}
-                                onChange={(e, n) => this.setState({tab: n})}
-                                aria-label="page tabs"
-                            >
+                                    <Divider sx={{m: "0.5em"}}/>
 
-                                {
-                                    this.state.tabs.map((data, index) => {
-                                        return <TabsLink sx={{
-                                            width: "8em"
-                                        }} label={data[0]} key={data[0]} icon={data[1]} value={data[2]} wrapped/>
-                                    })
-                                }
-                            </Tabs>
-                        </Stack>
-
-                        {this.state.login ? <>
-                            <IconButton sx={{p: 0}} onClick={() => this.setState({menu: true})}>
-                                <Avatar alt={this.state.data.username} src={this.state.data.photoURL}/>
-                            </IconButton>
-                            <Menu
-                                id="menu-appbar"
-                                anchorOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                keepMounted
-                                transformOrigin={{
-                                    vertical: 'top',
-                                    horizontal: 'right',
-                                }}
-                                open={this.state.menu}
-                                onClose={() => this.setState({menu: false})}
-                                sx={{
-                                    pt: "0"
-                                }}
-                            >
-                                <Stack direction={"row"} alignItems={"flex-end"} sx={{
-                                    m: "1em",
-                                    height: "5em",
-                                    width: "100%"
-                                }} spacing={3}>
-                                    <Stack>
-                                        <Typography color={"grey"}>
-                                            Welcome,
-                                        </Typography>
-                                        <Typography variant={this.state.data.username.length > 8 ? "h3" : "h2"}>
-                                            {this.state.data.username}
-                                        </Typography>
-                                    </Stack>
-                                    <Avatar alt={this.state.data.username} src={this.state.data.photoURL} sx={{
-                                        height: "4em",
-                                        width: "4em"
-                                    }}/>
-                                </Stack>
-
-                                <Divider sx={{m: "0.5em"}}/>
-                                <Link to={"settings"}>
-                                    <MenuItem onClick={() => this.setState({menu: false, tab: ""})} sx={{ color: "white" }}>
+                                    <MenuItem onClick={() => this.setState({menu: false, logoutDia: true})}>
                                         <ListItemIcon>
-                                            <Settings/>
+                                            <Logout color={"error"}/>
                                         </ListItemIcon>
-                                        Setting
+                                        <Typography color={"error"}>
+                                            Logout
+                                        </Typography>
                                     </MenuItem>
-                                </Link>
+                                    <Dialog open={this.state.logoutDia}>
+                                        <DialogTitle>
+                                            Logout Confirm
+                                        </DialogTitle>
+                                        <DialogContent>
+                                            Are you sure to logout?
+                                        </DialogContent>
+                                        <DialogActions>
+                                            <Button variant={"text"} onClick={() => this.setState({logoutDia: false})}>
+                                                Cancel
+                                            </Button>
+                                            <Button color={"error"} variant={"contained"} onClick={this.logout}>
+                                                Confirm
+                                            </Button>
+                                        </DialogActions>
+                                    </Dialog>
+                                </Menu>
+                            </> : <Link to={"login"}>
+                                <Button className={"noTD"} size={"large"} vaiant={"contained"}
+                                        onClick={() => this.setState({tab: "login"})}>
+                                    登入/註冊
+                                </Button>
+                            </Link>}
 
-                                <Divider sx={{m: "0.5em"}}/>
-
-                                <MenuItem onClick={() => this.setState({menu: false, logoutDia: true})}>
-                                    <ListItemIcon>
-                                        <Logout color={"error"}/>
-                                    </ListItemIcon>
-                                    <Typography color={"error"}>
-                                        Logout
-                                    </Typography>
-                                </MenuItem>
-                                <Dialog open={this.state.logoutDia}>
-                                    <DialogTitle>
-                                        Logout Confirm
-                                    </DialogTitle>
-                                    <DialogContent>
-                                        Are you sure to logout?
-                                    </DialogContent>
-                                    <DialogActions>
-                                        <Button variant={"text"} onClick={() => this.setState({logoutDia: false})}>
-                                            Cancel
-                                        </Button>
-                                        <Button color={"error"} variant={"contained"} onClick={this.logout}>
-                                            Confirm
-                                        </Button>
-                                    </DialogActions>
-                                </Dialog>
-                            </Menu>
-                        </> : <Link to={"login"}>
-                            <Button className={"noTD"} size={"large"} vaiant={"contained"}
-                                    onClick={() => this.setState({tab: "login"})}>
-                                登入/註冊
-                            </Button>
-                        </Link>}
-
-                    </Toolbar>
-                </ABar>
-            </Box>
+                        </Toolbar>
+                    </ABar>
+                </Collapse>
+                <Stack
+                    bgcolor={"rgba(255,255,255, 0.25)"}
+                    width={"4em"}
+                    height={"1.5em"}
+                    alignItems={"center"}
+                    borderRadius={"0 0 4px 4px"}
+                    mr={2}
+                    sx={{ cursor: "pointer" }}
+                    onClick={() => this.setState({ open: !this.state.open })}
+                >
+                    <ArrowBackIosNew sx={{
+                        rotate: this.state.open ? "90deg" : "-90deg",
+                        transition: "rotate 0.4s"
+                    }}/>
+                </Stack>
+            </Stack>
         )
     }
 }

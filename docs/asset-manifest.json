@@ -1,22 +1,22 @@
 {
   "files": {
     "main.css": "./static/css/main.4187d9cb.css",
-    "main.js": "./static/js/main.7315143f.js",
-    "static/js/445.644f060c.chunk.js": "./static/js/445.644f060c.chunk.js",
+    "main.js": "./static/js/main.de1bb9b7.js",
+    "static/js/445.eec8e282.chunk.js": "./static/js/445.eec8e282.chunk.js",
     "static/js/235.348f82e5.chunk.js": "./static/js/235.348f82e5.chunk.js",
-    "static/js/17.cb351bf3.chunk.js": "./static/js/17.cb351bf3.chunk.js",
+    "static/js/855.a47525d8.chunk.js": "./static/js/855.a47525d8.chunk.js",
     "static/media/logo.png": "./static/media/logo.1a243563d072b833376b.png",
     "static/media/Google Logo.svg": "./static/media/Google Logo.ab7caa8c05be78d8388ae25f88ab900e.svg",
     "static/media/UploadIcon.svg": "./static/media/UploadIcon.469126df4127e870c21611e576b85d00.svg",
     "index.html": "./index.html",
     "main.4187d9cb.css.map": "./static/css/main.4187d9cb.css.map",
-    "main.7315143f.js.map": "./static/js/main.7315143f.js.map",
-    "445.644f060c.chunk.js.map": "./static/js/445.644f060c.chunk.js.map",
+    "main.de1bb9b7.js.map": "./static/js/main.de1bb9b7.js.map",
+    "445.eec8e282.chunk.js.map": "./static/js/445.eec8e282.chunk.js.map",
     "235.348f82e5.chunk.js.map": "./static/js/235.348f82e5.chunk.js.map",
-    "17.cb351bf3.chunk.js.map": "./static/js/17.cb351bf3.chunk.js.map"
+    "855.a47525d8.chunk.js.map": "./static/js/855.a47525d8.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.4187d9cb.css",
-    "static/js/main.7315143f.js"
+    "static/js/main.de1bb9b7.js"
   ]
 }

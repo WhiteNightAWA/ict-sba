@@ -176,7 +176,7 @@ export class ItemDisplay extends Component {
                 items: this.props.items
             })
         } else {
-            let res = this.props.owner ? await Requires.get("/shops/items!/" + this.state.shop?._id) : await Requires.get("/shops/items/" + this.state.shop?._id);
+            let res = this.props.owner ? await Requires.get("/shops/items!") : await Requires.get("/shops/items/" + this.state.shop?._id);
             if (res.status === 200) {
                 this.setState({
                     items: res.data.items,

@@ -40,14 +40,12 @@ export class BarCodeIO extends Component {
                     },
                 }}>
                     <BarcodeScannerComponent
-                        onUpdate={(err, result) => {
-                            console.log(result);
+                        onUpdate={async (err, result) => {
                             if (result) this.setState({data: [...this.state.data, result.text]});
 
                         }}
                     />
                 </Box>
-                <p>{this.state.data}</p>
             </Stack>
         </Dialog>
     }

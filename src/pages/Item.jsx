@@ -35,6 +35,7 @@ import {
     Backdrop,
     IconButton,
     Pagination as Paginations,
+    Link
 } from "@mui/material";
 import {AutoPlaySwipeableViews, getValueColor, uploader, colors} from "../util/functions";
 import Pagination from "../components/Pagination";
@@ -87,6 +88,9 @@ export default class Item extends Component {
             noRatedUser: false,
             ratingFilter: window.localStorage.getItem("ratingFilter") === "true",
 
+
+            inputCount: 0,
+            inputMode: false,
         }
     }
 
@@ -407,33 +411,46 @@ export default class Item extends Component {
                                     </DialogActions>
                                 </Dialog>
                             </Stack>
-                            {this.props.owner && <>
-                                <Stack
-                                    height={"100%"}
-                                    justifyContent={"space-between"}
-                                    sx={{
-                                        border: "orange 1px solid",
-                                        borderRadius: "8px",
-                                        p: 1,
-                                        background: "repeating-linear-gradient(-45deg, rgba(255, 165, 0, .5), rgba(255, 165, 0, .6) 30px, rgba(255, 165, 0, 0) 0, rgba(255, 165, 0, 0) 50px) !important"
-                                    }}
-                                    spacing={2}
-                                >
-                                    <Button
-                                        variant={"contained"}
-                                        startIcon={<Input />}
-                                        onClick={() => this.setState({ bar: true })}
-                                    >
-                                        入貨
-                                    </Button>
-                                    <BarCodeIO open={this.state.bar} close={() => this.setState({ bar: false })}/>
-                                    <Button
-                                        variant={"contained"}
-                                        startIcon={<Sell />}
-                                    >
-                                        出貨
-                                    </Button>
-                                </Stack>
+                            {this.state.item.barCode ?
+                                <BarCodeIO open={this.state.inputMode} close={() => this.setState({ inputMode: false })}/> :
+                                <Dialog open={this.state.inputMode} onClose={() => this.setState({ inputMode: false })}>
+                                    <DialogTitle>
+                                        出/入貨
+                                    </DialogTitle>
+                                    <DialogContent>
+                                        <Stack p={2} spacing={1}>
+                                            <Typography color={"gray"}>
+                                                *如果您想同時批量出/入貨不同的商品，請點擊<Link sx={{ cursor: "pointer" }}>這裡</Link>。
+                                            </Typography>
+                                            <TextField
+                                                label={"出/入貨數量"}
+                                                helperText={"如果要入貨，輸入正數，否則輸入負數"}
+                                                type={"number"}
+                                                value={this.state.inputCount}
+                                                onChange={(e) => this.setState({ inputCount: (e.target.value && (e.target.value === "-" || !isNaN(Number(e.target.value)))) >= 0 ? e.target.value : this.state.inputCount })}
+                                            />
+                                        </Stack>
+                                    </DialogContent>
+                                    <DialogActions>
+                                        <Button variant={"contained"} color={"success"} disabled={[undefined, 0, "", "0", "-"].includes(this.state.inputCount)}>
+                                            <Typography variant={"h5"} onClick={async () => {
+                                                let item = await Requires.put("/users/ioItem/"+this.state.item._id, {
+                                                    count: Number(this.state.inputCount)
+                                                });
+                                                if (item.status === 200) {
+                                                    this.props.loadItem();
+                                                    this.setState({ item: item.data.item, inputMode: false })
+                                                } else {
+                                                    this.setState({ inputMode: false })
+                                                }
+                                            }}>
+                                                {Number(this.state.inputCount) > 0 ? "入" : "出"}貨!
+                                            </Typography>
+                                        </Button>
+                                    </DialogActions>
+                                </Dialog>
+                            }
+                            {this.props.owner &&
                                 <Stack
                                     height={"100%"}
                                     justifyContent={"space-between"}
@@ -445,7 +462,15 @@ export default class Item extends Component {
                                     }}
                                     spacing={2}
                                 >
+                                    <Button
+                                        variant={"contained"}
+                                        startIcon={<Input />}
+                                        onClick={() => this.setState({ inputMode: true })}
+                                    >
+                                        出/入貨
+                                    </Button>
                                     {this.state.item.visible ?
+
                                         <Button
                                             startIcon={<Visibility/>}
                                             variant={"contained"}
@@ -569,7 +594,6 @@ export default class Item extends Component {
                                         </DialogActions>
                                     </Dialog>
                                 </Stack>
-                            </>
                             }
                         </Stack>
                     </Stack>

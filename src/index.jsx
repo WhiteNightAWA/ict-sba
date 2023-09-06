@@ -20,6 +20,7 @@ import {DevSupport} from "@react-buddy/ide-toolbox";
 import {ComponentPreviews, useInitial} from "./dev";
 import Item from "./pages/Item";
 import Settings from "./pages/Settings";
+import {IOUI} from "./components/io/IOUI";
 
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
@@ -43,6 +44,8 @@ root.render(
                             <Route path={"login"} element={<Login/>}/>
                             <Route path={"myShop"} element={<MyShop/>}/>
                             <Route path={"settings"} element={<Settings/>}/>
+                            <Route path={"inputs"} element={<IOUI in={true}/>}/>
+                            <Route path={"outputs"} element={<IOUI in={false}/>}/>
 
                             <Route path={"*"} element={<NotFound/>}/>
                             <Route path={"pp"} element={<PP/>}/>
