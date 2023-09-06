@@ -31,6 +31,7 @@
     "react-dom": "^18.2.0",
     "react-flip-numbers": "^3.0.8",
     "react-images-upload": "^1.2.8",
+    "react-qr-barcode-scanner": "^1.0.6",
     "react-router-dom": "^6.11.1",
     "react-scripts": "5.0.1",
     "react-swipeable-views": "^0.14.0",

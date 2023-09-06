@@ -42,12 +42,13 @@ import {
     ArrowRight, Check, Delete, Edit,
     ExpandMore,
     Favorite,
-    Share, Star, Visibility, VisibilityOff, Warning, Add, Help, ArrowLeft, ChevronLeft, ChevronRight, Close
+    Share, Star, Visibility, VisibilityOff, Warning, Add, Help, ArrowLeft, ChevronLeft, ChevronRight, Close, Input, Sell
 } from "@mui/icons-material";
 import {UploadDropzone, UploadButton} from "react-uploader";
 import Requires from "../util/requires";
 import {AddItemDl} from "../components/shop/AddItemDl";
 import SwipeableViews from "react-swipeable-views";
+import {BarCodeIO} from "../components/io/BarCodeIO";
 
 export default class Item extends Component {
     constructor(props) {
@@ -159,7 +160,7 @@ export default class Item extends Component {
                         }
                     }}
                 >
-                    <Close />
+                    <Close/>
                 </IconButton>
                 <SwipeableViews index={this.state.showImagesPag}>
                     {this.state.item.imageList.map((url, index) => {
@@ -182,7 +183,7 @@ export default class Item extends Component {
                     size={"large"}
                     variant={"text"}
                     shape={"rounded"}
-                    onChange={(e, n) => this.setState({ showImagesPag: n })}
+                    onChange={(e, n) => this.setState({showImagesPag: n})}
                 />
             </Backdrop>
 
@@ -406,7 +407,33 @@ export default class Item extends Component {
                                     </DialogActions>
                                 </Dialog>
                             </Stack>
-                            {this.props.owner &&
+                            {this.props.owner && <>
+                                <Stack
+                                    height={"100%"}
+                                    justifyContent={"space-between"}
+                                    sx={{
+                                        border: "orange 1px solid",
+                                        borderRadius: "8px",
+                                        p: 1,
+                                        background: "repeating-linear-gradient(-45deg, rgba(255, 165, 0, .5), rgba(255, 165, 0, .6) 30px, rgba(255, 165, 0, 0) 0, rgba(255, 165, 0, 0) 50px) !important"
+                                    }}
+                                    spacing={2}
+                                >
+                                    <Button
+                                        variant={"contained"}
+                                        startIcon={<Input />}
+                                        onClick={() => this.setState({ bar: true })}
+                                    >
+                                        入貨
+                                    </Button>
+                                    <BarCodeIO open={this.state.bar} close={() => this.setState({ bar: false })}/>
+                                    <Button
+                                        variant={"contained"}
+                                        startIcon={<Sell />}
+                                    >
+                                        出貨
+                                    </Button>
+                                </Stack>
                                 <Stack
                                     height={"100%"}
                                     justifyContent={"space-between"}
@@ -542,6 +569,7 @@ export default class Item extends Component {
                                         </DialogActions>
                                     </Dialog>
                                 </Stack>
+                            </>
                             }
                         </Stack>
                     </Stack>
