@@ -289,6 +289,17 @@ class Buy extends Component {
                             value={this.state.name}
                             label={"Search"}
                             variant={"filled"}
+                            onFocus={(e) => this.setState({ inputing: true })}
+                            onBlur={(e) => this.setState({ inputing: false })}
+                            onKeyDown={async (e) => {
+                                if (e.keyCode === 13 && this.state.searchable) {
+                                    this.setState({
+                                        searchable: false,
+                                        pag: 0,
+                                    });
+                                    await this.loadItem();
+                                }
+                            }}
                             onChange={(e) => this.setState({name: e.target.value})}
                             fullWidth
                             size="big"
@@ -780,7 +791,7 @@ class Buy extends Component {
                 }}
             >
                 <Pagination
-                    count={Math.ceil(this.state.count / 5)}
+                    count={Math.ceil(this.state.count / 10)}
                     variant={"text"}
                     size={"large"}
                     onChange={async (e, n) => {

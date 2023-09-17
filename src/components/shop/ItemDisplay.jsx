@@ -376,7 +376,7 @@ export class ItemDisplay extends Component {
                     You need to Login / Signup first
                 </Alert>
             </Snackbar>
-            <Stack alignItems={"center"}>
+            <Stack alignItems={"center"} pb={"10vh"}>
                 {this.props.owner && <Button
                     fullWidth
                     variant={"outlined"}
@@ -869,7 +869,8 @@ export class ItemDisplay extends Component {
                                     return (<Card sx={{
                                         width: item,
                                         m: 3,
-                                    }} elevation={6}>
+                                    }} elevation={6}
+                                    >
                                         <CardHeader
                                             avatar={
                                                 <Skeleton variant="circular" width={40} height={40}/>
@@ -899,203 +900,408 @@ export class ItemDisplay extends Component {
                                             <Skeleton variant="text" sx={{fontSize: '1rem', width: "70%"}}/>
                                         </CardContent>
                                     </Card>)
-                                }) : this.getFiltedItems().length > 0 ? this.getFiltedItems().map((item, index) => {
-                                    return (<Card sx={{
-                                        width: "auto",
-                                        m: 2,
-                                        minWidth: "50%",
-                                        height: "fit-content",
-                                        background: item.visible === false ? "repeating-linear-gradient(-45deg, rgba(255, 255, 255, .125), rgba(255, 255, 255, .125) 30px, rgba(255, 0, 0, 0) 0, rgba(255, 255, 255, 0) 50px) !important" : ""
-                                    }} elevation={6}
-                                    >
-                                        <CardHeader
-                                            avatar={
-                                                <Avatar
-                                                    src={this.props.buy ? item.shopData.avatar : this.state.shop.avatar}
-                                                    alt={this.props.buy ? item.shopData.shopName : this.state.shop.shopName}
-                                                    sx={{
-                                                        height: 40,
-                                                        width: 40
-                                                    }}
-                                                />
-                                            }
-                                            action={
-                                                <>
-                                                    {this.props.buy && <IconButton size={"large"}
-                                                                                   onClick={() => window.location.hash = `/shop/${item.shopId}?itemId=${item._id}`}>
-                                                        <OpenInNew/>
-                                                    </IconButton>}
-                                                    {this.state.user?.favorited?.includes(item._id) ? <IconButton
-                                                        onClick={async () => await this.onFavorite(true, item._id)}
-                                                    >
-                                                        <Favorite sx={{color: "red"}}/>
-                                                    </IconButton> : <IconButton
-                                                        onClick={async () => this.state.user?._id ? await this.onFavorite(false, item._id) : this.setState({needLoginSb: true})}
-                                                    >
-                                                        <Favorite/>
-                                                    </IconButton>}
-                                                    {this.state.copied === item._id ? <IconButton
-                                                        onClick={() => {
-                                                            this.setState({copied: item._id})
-                                                            navigator.clipboard.writeText("https://" + window.location.host + `/#/shop/${item.shopId}?itemId=${item._id}`);
-                                                            setTimeout(() => this.setState({copied: null}), 1000);
-                                                        }}
-                                                    >
-                                                        <Check sx={{color: "lightgreen"}}/>
-                                                    </IconButton> : <IconButton
-                                                        onClick={() => {
-                                                            this.setState({copied: item._id})
-                                                            navigator.clipboard.writeText("https://" + window.location.host + (process.env.REACT_APP_HERF !== undefined ? process.env.REACT_APP_HERF : "") + `/#/shop/${item.shopId}?itemId=${item._id}`);
-                                                            setTimeout(() => this.setState({copied: null}), 1000);
-                                                        }}
-                                                    >
-                                                        <Share/>
-                                                    </IconButton>}
-
-                                                    <IconButton onClick={(e) => this.setState({menu: e.currentTarget})}>
-                                                        <MoreVert/>
-                                                    </IconButton>
-                                                    <Menu open={this.state.menu} anchorEl={this.state.menu}
-                                                          onClose={() => this.setState({menu: null})}>
-                                                        <MenuItem
-                                                            onClick={() => this.state.user?._id ? this.setState({
-                                                                reportDl: true,
-                                                                menu: null
-                                                            }) : this.setState({needLoginSb: true, menu: null})}
-                                                        >
-                                                            <ListItemIcon>
-                                                                <Warning/>
-                                                            </ListItemIcon>
-                                                            <ListItemText>
-                                                                Report
-                                                            </ListItemText>
-                                                        </MenuItem>
-                                                    </Menu>
-                                                </>
-                                            }
-                                            title={<Stack direction={"row"}>
-                                                <Typography variant={"h5"}>
-                                                    {this.props.buy ? item.shopData.shopName : this.state.shop.shopName}
-                                                </Typography>
-                                                <Typography fontSize={"1.5rem"} color={"gold"}>
-                                                    {this.props.showDistance && <>
-                                                        &nbsp;- {item.distance > 1 ? item.distance.toFixed(2).toString() + "公里" : Math.round(item.distance * 1000).toString() + "米"}
-                                                    </>}
-                                                </Typography>
-                                            </Stack>}
-                                            subheader={<Typography
-                                                sx={{fontSize: '1rem', width: "60%"}}>
-                                                {this.props.buy ? item.shopData.short : this.state.shop.short}
-                                            </Typography>}
-                                        />
-
-                                        {
-                                            item.imageList?.length !== 0 &&
-                                            <Box
-                                                sx={{
-                                                    position: 'relative',
-                                                    filter: "drop-shadow(2px 4px 6px black)",
-                                                    transition: "filter 0.5s, transform 0.5s",
-                                                    cursor: "pointer",
-                                                    "&:hover": {
-                                                        filter: "drop-shadow(2px 4px 6px black) brightness(0.5)",
-                                                        transform: "scale(1.125)",
-                                                    }
-                                                }}
-                                                onClick={(e) => this.setState({showImages: item.imageList})}
+                                }) : this.getFiltedItems().length > 0 ? <Stack direction={"row"} justifyContent={"space-evenly"} overflow={"hidden"} width={"100%"}>
+                                    <Stack width={"45%"}>
+                                        {this.getFiltedItems().filter((i, index) => index%2 === 0).map((item, index) => {
+                                            return (<Card sx={{
+                                                width: "100%",
+                                                m: 2,
+                                                height: "fit-content",
+                                                background: item.visible === false ? "repeating-linear-gradient(-45deg, rgba(255, 255, 255, .125), rgba(255, 255, 255, .125) 30px, rgba(255, 0, 0, 0) 0, rgba(255, 255, 255, 0) 50px) !important" : ""
+                                            }} elevation={6}
                                             >
-                                                <AutoPlaySwipeableViews
-                                                    index={this.state.pag[index]}
-                                                    onChangeIndex={(i) => {
-                                                        let newPag = this.state.pag;
-                                                        newPag[index] = i;
-                                                        this.setState({pag: newPag})
-                                                    }}
-                                                >
-                                                    {
-                                                        item.imageList?.map((url, index) => {
-                                                            return (
-                                                                <CardMedia
-                                                                    key={index}
-                                                                    sx={{height: 200}}
-                                                                    image={url}
-                                                                    title={url}
-                                                                />)
-                                                        })
+                                                <CardHeader
+                                                    avatar={
+                                                        <Avatar
+                                                            src={this.props.buy ? item.shopData.avatar : this.state.shop.avatar}
+                                                            alt={this.props.buy ? item.shopData.shopName : this.state.shop.shopName}
+                                                            sx={{
+                                                                height: 40,
+                                                                width: 40
+                                                            }}
+                                                        />
                                                     }
-                                                </AutoPlaySwipeableViews>
-                                                <Pagination
-                                                    dots={item.imageList?.length}
-                                                    index={this.state.pag[index]}
-                                                    onChangeIndex={(i) => {
-                                                        let newPag = this.state.pag;
-                                                        newPag[index] = i;
-                                                        this.setState({pag: newPag})
-                                                    }}
-                                                />
-                                            </Box>
-                                        }
-                                        <CardActionArea onClick={(e) => this.setState({selectedItem: item})}>
-                                            <CardContent>
-                                                <Stack direction={"row"}
-                                                       justifyContent={"space-between"}>
-                                                    <Stack>
-                                                        <Typography fontSize={'1rem'}
-                                                                    color={"darkgray"}>
-                                                            {item.others ? item.selectedCategoryOther : item.selectedCategory.join("\n")}
-                                                        </Typography>
-                                                        <Typography variant={"h3"}>
-                                                            {item.name}
-                                                        </Typography>
+                                                    action={
+                                                        <>
+                                                            {this.props.buy && <IconButton size={"large"}
+                                                                                           onClick={() => window.location.hash = `/shop/${item.shopId}?itemId=${item._id}`}>
+                                                                <OpenInNew/>
+                                                            </IconButton>}
+                                                            {this.state.user?.favorited?.includes(item._id) ? <IconButton
+                                                                onClick={async () => await this.onFavorite(true, item._id)}
+                                                            >
+                                                                <Favorite sx={{color: "red"}}/>
+                                                            </IconButton> : <IconButton
+                                                                onClick={async () => this.state.user?._id ? await this.onFavorite(false, item._id) : this.setState({needLoginSb: true})}
+                                                            >
+                                                                <Favorite/>
+                                                            </IconButton>}
+                                                            {this.state.copied === item._id ? <IconButton
+                                                                onClick={() => {
+                                                                    this.setState({copied: item._id})
+                                                                    navigator.clipboard.writeText("https://" + window.location.host + `/#/shop/${item.shopId}?itemId=${item._id}`);
+                                                                    setTimeout(() => this.setState({copied: null}), 1000);
+                                                                }}
+                                                            >
+                                                                <Check sx={{color: "lightgreen"}}/>
+                                                            </IconButton> : <IconButton
+                                                                onClick={() => {
+                                                                    this.setState({copied: item._id})
+                                                                    navigator.clipboard.writeText("https://" + window.location.host + (process.env.REACT_APP_HERF !== undefined ? process.env.REACT_APP_HERF : "") + `/#/shop/${item.shopId}?itemId=${item._id}`);
+                                                                    setTimeout(() => this.setState({copied: null}), 1000);
+                                                                }}
+                                                            >
+                                                                <Share/>
+                                                            </IconButton>}
 
-                                                        <Stack direction={"row"} alignItems={"center"}>
-                                                            <Rating
-                                                                readOnly
-                                                                value={[0, undefined].includes(item.rating?.length) ? 0 : item.rating.map(r => r.rate).reduce((a, c) => a + c) / item.rating.length}
-                                                                precision={0.5}
-                                                                icon={<Star/>}
-                                                                emptyIcon={<Star style={{opacity: 0.55}}/>}
-                                                            />
-                                                            <Typography color={"gray"} pl={1}>
-                                                                ({[0, undefined].includes(item.rating?.length) ? "暫無評價" : item.rating.length})
-                                                            </Typography>
-                                                        </Stack>
-                                                        <Typography variant={"h6"} color={"lightgray"} maxWidth={"20em"}>
-                                                            {item.desc}
-                                                        </Typography>
-                                                    </Stack>
-                                                    <Box sx={{width: 60}}/>
-                                                    <Stack justifyContent={"space-between"} sx={{
-                                                        "*": {
-                                                            textAlign: "right"
-                                                        }
-                                                    }}>
-                                                        <Typography color={"lightgreen"}
-                                                                    fontSize={"1.25rem"}>
-                                                            <a style={{
-                                                                fontSize: "2.5rem"
-                                                            }}>${Math.ceil(Math.min(...item.price.map(i => i[0] / i[1])) * 10) / 10}</a><sub>/{item.unit}</sub>
-                                                        </Typography>
-                                                        {item.record.length < 1 ?
-                                                            <Typography variant={"h4"} color={"red"}>
-                                                                無庫存
-                                                            </Typography> : <Tooltip
-                                                                title={<Typography variant={"h5"}
-                                                                                   textAlign={"center"}>最近最新鮮的進貨日期:<br/>{`${('0' + (new Date(Math.max(...item.record.map(r => new Date(r.time))))).getDate()).slice(-2)}-${('0' + ((new Date(Math.max(...item.record.map(r => new Date(r.time))))).getMonth() + 1)).slice(-2)}-${(new Date(Math.max(...item.record.map(r => new Date(r.time))))).getFullYear()}`}
-                                                                </Typography>}>
-                                                                <Typography
-                                                                    color={getValueColor(Math.min(...item.record.map(r => Math.floor((new Date() - new Date(r.time)) / (1000 * 60 * 60 * 24)))))}
-                                                                    variant={"h4"}
+                                                            <IconButton onClick={(e) => this.setState({menu: e.currentTarget})}>
+                                                                <MoreVert/>
+                                                            </IconButton>
+                                                            <Menu open={this.state.menu} anchorEl={this.state.menu}
+                                                                  onClose={() => this.setState({menu: null})}>
+                                                                <MenuItem
+                                                                    onClick={() => this.state.user?._id ? this.setState({
+                                                                        reportDl: true,
+                                                                        menu: null
+                                                                    }) : this.setState({needLoginSb: true, menu: null})}
                                                                 >
-                                                                    {Math.min(...item.record.map(r => Math.floor((new Date() - new Date(r.time)) / (1000 * 60 * 60 * 24))))}日{Math.min(...item.record.map(r => Math.floor((new Date() - new Date(r.time)) / (1000 * 60 * 60) % 24)))}小時
-                                                                </Typography></Tooltip>
-                                                        }
-                                                    </Stack>
-                                                </Stack>
-                                            </CardContent>
-                                        </CardActionArea>
-                                    </Card>)
-                                }) : <Stack sx={{width: "90%", height: "50vh"}}
+                                                                    <ListItemIcon>
+                                                                        <Warning/>
+                                                                    </ListItemIcon>
+                                                                    <ListItemText>
+                                                                        Report
+                                                                    </ListItemText>
+                                                                </MenuItem>
+                                                            </Menu>
+                                                        </>
+                                                    }
+                                                    title={<Stack direction={"row"}>
+                                                        <Typography variant={"h5"}>
+                                                            {this.props.buy ? item.shopData.shopName : this.state.shop.shopName}
+                                                        </Typography>
+                                                        <Typography fontSize={"1.5rem"} color={"gold"}>
+                                                            {this.props.showDistance && <>
+                                                                &nbsp;- {item.distance > 1 ? item.distance.toFixed(2).toString() + "公里" : Math.round(item.distance * 1000).toString() + "米"}
+                                                            </>}
+                                                        </Typography>
+                                                    </Stack>}
+                                                    subheader={<Typography
+                                                        sx={{fontSize: '1rem', width: "60%"}}>
+                                                        {this.props.buy ? item.shopData.short : this.state.shop.short}
+                                                    </Typography>}
+                                                />
+
+                                                {
+                                                    item.imageList?.length !== 0 &&
+                                                    <Box
+                                                        sx={{
+                                                            position: 'relative',
+                                                            filter: "drop-shadow(2px 4px 6px black)",
+                                                            transition: "filter 0.5s, transform 0.5s",
+                                                            cursor: "pointer",
+                                                            "&:hover": {
+                                                                filter: "drop-shadow(2px 4px 6px black) brightness(0.5)",
+                                                                transform: "scale(1.125)",
+                                                            }
+                                                        }}
+                                                        onClick={(e) => this.setState({showImages: item.imageList})}
+                                                    >
+                                                        <AutoPlaySwipeableViews
+                                                            index={this.state.pag[index]}
+                                                            onChangeIndex={(i) => {
+                                                                let newPag = this.state.pag;
+                                                                newPag[index] = i;
+                                                                this.setState({pag: newPag})
+                                                            }}
+                                                        >
+                                                            {
+                                                                item.imageList?.map((url, index) => {
+                                                                    return (
+                                                                        <CardMedia
+                                                                            key={index}
+                                                                            sx={{height: 200}}
+                                                                            image={url}
+                                                                            title={url}
+                                                                        />)
+                                                                })
+                                                            }
+                                                        </AutoPlaySwipeableViews>
+                                                        <Pagination
+                                                            dots={item.imageList?.length}
+                                                            index={this.state.pag[index]}
+                                                            onChangeIndex={(i) => {
+                                                                let newPag = this.state.pag;
+                                                                newPag[index] = i;
+                                                                this.setState({pag: newPag})
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                }
+                                                <CardActionArea onClick={(e) => this.setState({selectedItem: item})}>
+                                                    <CardContent>
+                                                        <Stack direction={"row"}
+                                                               justifyContent={"space-between"}>
+                                                            <Stack>
+                                                                <Typography fontSize={'1rem'}
+                                                                            color={"darkgray"}>
+                                                                    {item.others ? item.selectedCategoryOther : item.selectedCategory.join("\n")}
+                                                                </Typography>
+                                                                <Typography variant={"h3"}>
+                                                                    {item.name}
+                                                                </Typography>
+
+                                                                <Stack direction={"row"} alignItems={"center"}>
+                                                                    <Rating
+                                                                        readOnly
+                                                                        value={[0, undefined].includes(item.rating?.length) ? 0 : item.rating.map(r => r.rate).reduce((a, c) => a + c) / item.rating.length}
+                                                                        precision={0.5}
+                                                                        icon={<Star/>}
+                                                                        emptyIcon={<Star style={{opacity: 0.55}}/>}
+                                                                    />
+                                                                    <Typography color={"gray"} pl={1}>
+                                                                        ({[0, undefined].includes(item.rating?.length) ? "暫無評價" : item.rating.length})
+                                                                    </Typography>
+                                                                </Stack>
+                                                                <Typography variant={"h6"} color={"lightgray"} maxWidth={"20em"}>
+                                                                    {item.desc.substring(0, 50)}
+                                                                    {item.desc.length > 100 && "..."}
+                                                                </Typography>
+                                                            </Stack>
+                                                            <Box sx={{width: 60}}/>
+                                                            <Stack justifyContent={"space-between"} sx={{
+                                                                minWidth: "30%",
+                                                                "*": {
+                                                                    textAlign: "right"
+                                                                }
+                                                            }}>
+                                                                <Typography color={"lightgreen"}
+                                                                            fontSize={"1.25rem"}>
+                                                                    <a style={{
+                                                                        fontSize: "2.5rem"
+                                                                    }}>${Math.ceil(Math.min(...item.price.map(i => i[0] / i[1])) * 10) / 10}</a><sub>/{item.unit}</sub>
+                                                                </Typography>
+                                                                {item.record.length < 1 ?
+                                                                    <Typography variant={"h4"} color={"red"}>
+                                                                        無庫存
+                                                                    </Typography> : <Tooltip
+                                                                        title={<Typography variant={"h5"}
+                                                                                           textAlign={"center"}>最近最新鮮的進貨日期:<br/>{`${('0' + (new Date(Math.max(...item.record.map(r => new Date(r.time))))).getDate()).slice(-2)}-${('0' + ((new Date(Math.max(...item.record.map(r => new Date(r.time))))).getMonth() + 1)).slice(-2)}-${(new Date(Math.max(...item.record.map(r => new Date(r.time))))).getFullYear()}`}
+                                                                        </Typography>}>
+                                                                        <Typography
+                                                                            color={getValueColor(Math.min(...item.record.map(r => Math.floor((new Date() - new Date(r.time)) / (1000 * 60 * 60 * 24)))))}
+                                                                            variant={"h4"}
+                                                                        >
+                                                                            {Math.min(...item.record.map(r => Math.floor((new Date() - new Date(r.time)) / (1000 * 60 * 60 * 24))))}日{Math.min(...item.record.map(r => Math.floor((new Date() - new Date(r.time)) / (1000 * 60 * 60) % 24)))}小時
+                                                                        </Typography></Tooltip>
+                                                                }
+                                                            </Stack>
+                                                        </Stack>
+                                                    </CardContent>
+                                                </CardActionArea>
+                                            </Card>)
+                                        })}
+                                    </Stack>
+                                    <Stack width={"45%"}>
+                                        {this.getFiltedItems().filter((i, index) => index%2 === 1).map((item, index) => {
+                                            return (<Card sx={{
+                                                width: "100%",
+                                                m: 2,
+                                                height: "fit-content",
+                                                background: item.visible === false ? "repeating-linear-gradient(-45deg, rgba(255, 255, 255, .125), rgba(255, 255, 255, .125) 30px, rgba(255, 0, 0, 0) 0, rgba(255, 255, 255, 0) 50px) !important" : ""
+                                            }} elevation={6}
+                                            >
+                                                <CardHeader
+                                                    avatar={
+                                                        <Avatar
+                                                            src={this.props.buy ? item.shopData.avatar : this.state.shop.avatar}
+                                                            alt={this.props.buy ? item.shopData.shopName : this.state.shop.shopName}
+                                                            sx={{
+                                                                height: 40,
+                                                                width: 40
+                                                            }}
+                                                        />
+                                                    }
+                                                    action={
+                                                        <>
+                                                            {this.props.buy && <IconButton size={"large"}
+                                                                                           onClick={() => window.location.hash = `/shop/${item.shopId}?itemId=${item._id}`}>
+                                                                <OpenInNew/>
+                                                            </IconButton>}
+                                                            {this.state.user?.favorited?.includes(item._id) ? <IconButton
+                                                                onClick={async () => await this.onFavorite(true, item._id)}
+                                                            >
+                                                                <Favorite sx={{color: "red"}}/>
+                                                            </IconButton> : <IconButton
+                                                                onClick={async () => this.state.user?._id ? await this.onFavorite(false, item._id) : this.setState({needLoginSb: true})}
+                                                            >
+                                                                <Favorite/>
+                                                            </IconButton>}
+                                                            {this.state.copied === item._id ? <IconButton
+                                                                onClick={() => {
+                                                                    this.setState({copied: item._id})
+                                                                    navigator.clipboard.writeText("https://" + window.location.host + `/#/shop/${item.shopId}?itemId=${item._id}`);
+                                                                    setTimeout(() => this.setState({copied: null}), 1000);
+                                                                }}
+                                                            >
+                                                                <Check sx={{color: "lightgreen"}}/>
+                                                            </IconButton> : <IconButton
+                                                                onClick={() => {
+                                                                    this.setState({copied: item._id})
+                                                                    navigator.clipboard.writeText("https://" + window.location.host + (process.env.REACT_APP_HERF !== undefined ? process.env.REACT_APP_HERF : "") + `/#/shop/${item.shopId}?itemId=${item._id}`);
+                                                                    setTimeout(() => this.setState({copied: null}), 1000);
+                                                                }}
+                                                            >
+                                                                <Share/>
+                                                            </IconButton>}
+
+                                                            <IconButton onClick={(e) => this.setState({menu: e.currentTarget})}>
+                                                                <MoreVert/>
+                                                            </IconButton>
+                                                            <Menu open={this.state.menu} anchorEl={this.state.menu}
+                                                                  onClose={() => this.setState({menu: null})}>
+                                                                <MenuItem
+                                                                    onClick={() => this.state.user?._id ? this.setState({
+                                                                        reportDl: true,
+                                                                        menu: null
+                                                                    }) : this.setState({needLoginSb: true, menu: null})}
+                                                                >
+                                                                    <ListItemIcon>
+                                                                        <Warning/>
+                                                                    </ListItemIcon>
+                                                                    <ListItemText>
+                                                                        Report
+                                                                    </ListItemText>
+                                                                </MenuItem>
+                                                            </Menu>
+                                                        </>
+                                                    }
+                                                    title={<Stack direction={"row"}>
+                                                        <Typography variant={"h5"}>
+                                                            {this.props.buy ? item.shopData.shopName : this.state.shop.shopName}
+                                                        </Typography>
+                                                        <Typography fontSize={"1.5rem"} color={"gold"}>
+                                                            {this.props.showDistance && <>
+                                                                &nbsp;- {item.distance > 1 ? item.distance.toFixed(2).toString() + "公里" : Math.round(item.distance * 1000).toString() + "米"}
+                                                            </>}
+                                                        </Typography>
+                                                    </Stack>}
+                                                    subheader={<Typography
+                                                        sx={{fontSize: '1rem', width: "60%"}}>
+                                                        {this.props.buy ? item.shopData.short : this.state.shop.short}
+                                                    </Typography>}
+                                                />
+
+                                                {
+                                                    item.imageList?.length !== 0 &&
+                                                    <Box
+                                                        sx={{
+                                                            position: 'relative',
+                                                            filter: "drop-shadow(2px 4px 6px black)",
+                                                            transition: "filter 0.5s, transform 0.5s",
+                                                            cursor: "pointer",
+                                                            "&:hover": {
+                                                                filter: "drop-shadow(2px 4px 6px black) brightness(0.5)",
+                                                                transform: "scale(1.125)",
+                                                            }
+                                                        }}
+                                                        onClick={(e) => this.setState({showImages: item.imageList})}
+                                                    >
+                                                        <AutoPlaySwipeableViews
+                                                            index={this.state.pag[index]}
+                                                            onChangeIndex={(i) => {
+                                                                let newPag = this.state.pag;
+                                                                newPag[index] = i;
+                                                                this.setState({pag: newPag})
+                                                            }}
+                                                        >
+                                                            {
+                                                                item.imageList?.map((url, index) => {
+                                                                    return (
+                                                                        <CardMedia
+                                                                            key={index}
+                                                                            sx={{height: 200}}
+                                                                            image={url}
+                                                                            title={url}
+                                                                        />)
+                                                                })
+                                                            }
+                                                        </AutoPlaySwipeableViews>
+                                                        <Pagination
+                                                            dots={item.imageList?.length}
+                                                            index={this.state.pag[index]}
+                                                            onChangeIndex={(i) => {
+                                                                let newPag = this.state.pag;
+                                                                newPag[index] = i;
+                                                                this.setState({pag: newPag})
+                                                            }}
+                                                        />
+                                                    </Box>
+                                                }
+                                                <CardActionArea onClick={(e) => this.setState({selectedItem: item})}>
+                                                    <CardContent>
+                                                        <Stack direction={"row"}
+                                                               justifyContent={"space-between"}>
+                                                            <Stack>
+                                                                <Typography fontSize={'1rem'}
+                                                                            color={"darkgray"}>
+                                                                    {item.others ? item.selectedCategoryOther : item.selectedCategory.join("\n")}
+                                                                </Typography>
+                                                                <Typography variant={"h3"}>
+                                                                    {item.name}
+                                                                </Typography>
+
+                                                                <Stack direction={"row"} alignItems={"center"}>
+                                                                    <Rating
+                                                                        readOnly
+                                                                        value={[0, undefined].includes(item.rating?.length) ? 0 : item.rating.map(r => r.rate).reduce((a, c) => a + c) / item.rating.length}
+                                                                        precision={0.5}
+                                                                        icon={<Star/>}
+                                                                        emptyIcon={<Star style={{opacity: 0.55}}/>}
+                                                                    />
+                                                                    <Typography color={"gray"} pl={1}>
+                                                                        ({[0, undefined].includes(item.rating?.length) ? "暫無評價" : item.rating.length})
+                                                                    </Typography>
+                                                                </Stack>
+                                                                <Typography variant={"h6"} color={"lightgray"} maxWidth={"20em"}>
+                                                                    {item.desc.substring(0, 100)}
+                                                                    {item.desc.length > 100 && "..."}
+                                                                </Typography>
+                                                            </Stack>
+                                                            <Box sx={{width: 60}}/>
+                                                            <Stack justifyContent={"space-between"} sx={{
+                                                                minWidth: "30%",
+                                                                "*": {
+                                                                    textAlign: "right"
+                                                                }
+                                                            }}>
+                                                                <Typography color={"lightgreen"}
+                                                                            fontSize={"1.25rem"}>
+                                                                    <a style={{
+                                                                        fontSize: "2.5rem"
+                                                                    }}>${Math.ceil(Math.min(...item.price.map(i => i[0] / i[1])) * 10) / 10}</a><sub>/{item.unit}</sub>
+                                                                </Typography>
+                                                                {item.record.length < 1 ?
+                                                                    <Typography variant={"h4"} color={"red"}>
+                                                                        無庫存
+                                                                    </Typography> : <Tooltip
+                                                                        title={<Typography variant={"h5"}
+                                                                                           textAlign={"center"}>最近最新鮮的進貨日期:<br/>{`${('0' + (new Date(Math.max(...item.record.map(r => new Date(r.time))))).getDate()).slice(-2)}-${('0' + ((new Date(Math.max(...item.record.map(r => new Date(r.time))))).getMonth() + 1)).slice(-2)}-${(new Date(Math.max(...item.record.map(r => new Date(r.time))))).getFullYear()}`}
+                                                                        </Typography>}>
+                                                                        <Typography
+                                                                            color={getValueColor(Math.min(...item.record.map(r => Math.floor((new Date() - new Date(r.time)) / (1000 * 60 * 60 * 24)))))}
+                                                                            variant={"h4"}
+                                                                        >
+                                                                            {Math.min(...item.record.map(r => Math.floor((new Date() - new Date(r.time)) / (1000 * 60 * 60 * 24))))}日{Math.min(...item.record.map(r => Math.floor((new Date() - new Date(r.time)) / (1000 * 60 * 60) % 24)))}小時
+                                                                        </Typography></Tooltip>
+                                                                }
+                                                            </Stack>
+                                                        </Stack>
+                                                    </CardContent>
+                                                </CardActionArea>
+                                            </Card>)
+                                        })}
+                                    </Stack>
+                                </Stack> : <Stack sx={{width: "90%", height: "50vh"}}
                                             alignItems={"center"}
                                             justifyContent={"center"}>
                                     <Typography variant={"h1"} color={"gray"}>沒有搜尋結果</Typography>
@@ -1223,13 +1429,15 @@ export class ItemDisplay extends Component {
                                                     <Stack direction={"row"} spacing={4}
                                                            width={"60%"}
                                                            justifyContent={"center"}
-                                                           alignItems={"center"}>
+                                                           overflow={"hidden"}
+                                                           alignItems={"center"}
+                                                    >
                                                         <Stack alignItems={"center"}>
                                                             <Typography fontSize={'1rem'}
                                                                         color={"darkgray"}>
                                                                 {item.others ? item.selectedCategoryOther : item.selectedCategory.join("\n")}
                                                             </Typography>
-                                                            <Typography variant={"h3"}>
+                                                            <Typography variant={"h3"} width={"60%"} overflow={"hidden"}>
                                                                 {item.name}
                                                             </Typography>
                                                         </Stack>
@@ -1331,7 +1539,6 @@ export class ItemDisplay extends Component {
                             </List>
                         </Box>
                 }
-
             </Stack>
 
             <AddItemDl

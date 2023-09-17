@@ -596,9 +596,8 @@ export class AddItemDl extends Component {
                                                     value={item[0]}
                                                     disabled={this.state.loading}
                                                     type={"number"}
-                                                    fullWidth
                                                     variant={"standard"}
-                                                    error={item[0] < 1}
+                                                    error={item[0] < 1 || item[0] > 99999}
                                                     onChange={(e) => {
                                                         let newPrice = this.state.price
                                                         newPrice[index] = [Number(e.target.value), item[1]]
@@ -614,10 +613,9 @@ export class AddItemDl extends Component {
                                                 <ArrowRight/>
                                                 <TextField
                                                     value={item[1]}
-                                                    fullWidth
                                                     disabled={this.state.loading}
                                                     type={"number"}
-                                                    error={item[1] < 1}
+                                                    error={!item[1] > 0}
                                                     variant={"standard"}
                                                     onChange={(e) => {
                                                         let newPrice = this.state.price
@@ -680,7 +678,7 @@ export class AddItemDl extends Component {
                             this.state.price.filter(e =>
                                 e.includes(null) ||
                                 e.includes("") ||
-                                e[0] < 1 || e[1] < 1
+                                e[0] < 1 || e[0] > 99999 || !(e[1] > 0)
                             ).length > 0
                         )}
                         loading={this.state.loading}

@@ -4,7 +4,7 @@ import react from "react";
 import {
     ThemeProvider,
     Paper,
-    createTheme, Dialog, DialogTitle, DialogContent, Typography
+    createTheme, Dialog, DialogTitle, DialogContent, Typography, Divider
 } from "@mui/material";
 import {Outlet} from "react-router-dom";
 import AppBar from "./components/AppBar";
@@ -31,25 +31,34 @@ class App extends react.Component {
                     },
                 })
             },
-            showUpdate: window.localStorage.getItem("lastVersion") !== "1.0.1",
+            showUpdate: window.localStorage.getItem("lastVersion") !== "1.0.",
         }
     }
 
     componentDidMount() {
-        window.localStorage.setItem("lastVersion", "1.0.1")
+        window.localStorage.setItem("lastVersion", "1.0.2")
     }
 
     render() {
         return (
             <ThemeProvider theme={this.state.darkMode.theme} className={"test"}>
                 <Dialog maxWidth={"md"} open={this.state.showUpdate} onClose={() => this.setState({ showUpdate: false })}>
-                    <DialogTitle>
+                    <DialogContent>
                         <Typography variant={"h3"}>
+                            V1.0.2 - Update notes
+                        </Typography>
+                        <Typography variant={"h6"}>
+                            ~ Remake Item Display sorting list (==> two side) <br/>
+                            ~ Temp fix some title text over flow. <br/>
+                            ~ Set item per page to 10/page <br/>
+                            - limit card description to 100 chars. <br/>
+                            - support "press Enter" to search.
+                        </Typography>
+                        <Divider sx={{ m: 3 }}/>
+                        <Typography variant={"h5"}>
                             V1.0.1 - Update notes
                         </Typography>
-                    </DialogTitle>
-                    <DialogContent>
-                        <Typography variant={"h6"}>
+                        <Typography variant={"p"}>
                             ~ Merge Google Login & Signup <br/>
                             ~ Now same email (gmail) can register both email and google account. <br/>
                             ~ Fixed "favorite" function <br/>
