@@ -31,7 +31,7 @@ class App extends react.Component {
                     },
                 })
             },
-            showUpdate: window.localStorage.getItem("lastVersion") !== "1.0.",
+            showUpdate: window.localStorage.getItem("lastVersion") !== "1.0.2",
         }
     }
 
